@@ -1,0 +1,12 @@
+/* Paint behind the cutout; reserve space only for controls and readable content. */
+.android-client{--client-safe-top:max(env(safe-area-inset-top,0px),var(--native-safe-top,0px));--client-safe-left:max(env(safe-area-inset-left,0px),var(--native-safe-left,0px));--client-safe-right:max(env(safe-area-inset-right,0px),var(--native-safe-right,0px));--client-safe-bottom:max(env(safe-area-inset-bottom,0px),var(--native-safe-bottom,0px))}
+.android-client .on-home .home-toolbar{padding-top:calc(var(--client-safe-top) + clamp(10px,2dvh,22px));padding-left:max(16px,var(--client-safe-left));padding-right:max(16px,var(--client-safe-right))}
+.android-client .battle-header{height:calc(70px + var(--client-safe-top));padding-top:var(--client-safe-top);padding-left:max(12px,var(--client-safe-left));padding-right:max(12px,var(--client-safe-right))}
+.android-client .room-navigation{padding-top:calc(10px + var(--client-safe-top));padding-left:max(14px,var(--client-safe-left));padding-right:max(14px,var(--client-safe-right))}
+.android-client .prologue-screen,.android-client .resource-boot{padding-top:calc(24px + var(--client-safe-top));padding-bottom:calc(24px + var(--client-safe-bottom));padding-left:max(20px,var(--client-safe-left));padding-right:max(20px,var(--client-safe-right))}
+.android-client .on-home .home-footnote{padding-bottom:max(8px,var(--client-safe-bottom))}
+.android-client .on-home .home-stage{padding-left:max(17px,var(--client-safe-left));padding-right:max(17px,var(--client-safe-right))}
+.android-client .tutorial-speech,.android-client #tutorial-helper{left:max(12px,var(--client-safe-left));bottom:max(12px,var(--client-safe-bottom))}
+.android-client .modal-backdrop{padding-top:calc(16px + var(--client-safe-top));padding-bottom:calc(16px + var(--client-safe-bottom))}
+.android-client .guided-lesson .modal-backdrop{padding-bottom:calc(var(--tutorial-space,180px) + var(--client-safe-bottom))}
+.android-client #fullscreen-toggle{display:none}

@@ -1,0 +1,60 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.efs.sdk.plugin'
+
+android {
+    namespace 'cn.leangarden.client'
+    compileSdk 36
+    buildToolsVersion '36.0.0'
+    defaultConfig {
+        applicationId 'cn.leangarden.client'
+        minSdk 26
+        targetSdk 36
+        versionCode 20
+        versionName '0.13.1'
+    }
+    signingConfigs {
+        local {
+            def signing = new groovy.json.JsonSlurper().parse(rootProject.file('.signing/local.json'))
+            storeFile rootProject.file('.signing/local.jks')
+            storePassword signing.password
+            keyAlias signing.alias
+            keyPassword signing.password
+        }
+    }
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.local
+        }
+        release {
+            signingConfig signingConfigs.local
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+}
+
+efs {
+    enable = true
+    whiteList = ["cn.leangarden.client"]
+    blackList = []
+}
+dependencies {
+    implementation 'com.umeng.umsdk:common:+'
+    implementation 'com.umeng.umsdk:asms:+'
+    implementation 'com.umeng.umsdk:apm:+'
+    implementation 'com.umeng.umsdk:union:3.7.1'
+}
+
+dependencyLocking {
+    lockAllConfigurations()
+}

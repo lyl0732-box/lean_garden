@@ -1,0 +1,90 @@
+LEAN GARDEN MUSIC ATTRIBUTION
+
+All ten recordings below are by Kevin MacLeod (incompetech.com).
+Seven are active; three are retained as historical assets.
+Licensed under Creative Commons: By Attribution 4.0 License
+https://creativecommons.org/licenses/by/4.0/
+
+Original source recordings are retained locally. Since v0.9, optimized playback
+copies in ../optimized/ are transcoded with FFmpeg/libmp3lame to 128 kbps (high)
+or 64 kbps (low); musical structure is unchanged. Cloud packages distribute
+these optimized copies with this attribution instead of the original MP3s.
+Runtime playback may reduce volume, loop whole recordings, and crossfade.
+Keep titles, artist, source URLs, and the license notice when redistributing.
+No endorsement by the composer is implied.
+
+Official track-page attribution and pieces.json metadata checked 2026-10-28.
+Enchanted Valley and Magic Forest checked 2026-10-29.
+Adventures in Adventureland checked 2026-10-30.
+Metadata source: https://incompetech.com/music/royalty-free/pieces.json
+Full file sizes, MP3 metadata, and SHA-256 checksums: manifest.json.
+
+1. "Carefree" Kevin MacLeod (incompetech.com)
+Scene: home
+File: carefree-kevin-macleod.mp3
+ISRC: USUAN1400037
+Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1400037
+Download: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Carefree.mp3
+
+2. "Monkeys Spinning Monkeys" Kevin MacLeod (incompetech.com)
+Scene: historical map / minigames recording, replaced in v0.6
+File: monkeys-spinning-monkeys-kevin-macleod.mp3
+ISRC: USUAN1400011
+Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1400011
+Download: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Monkeys%20Spinning%20Monkeys.mp3
+
+3. "Wholesome" Kevin MacLeod (incompetech.com)
+Scene: garden
+File: wholesome-kevin-macleod.mp3
+ISRC: USUAN1900022
+Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1900022
+Download: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Wholesome.mp3
+
+4. "Life of Riley" Kevin MacLeod (incompetech.com)
+Scene: natural-number campaign
+File: life-of-riley-kevin-macleod.mp3
+ISRC: USUAN1400054
+Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1400054
+Download: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Life%20of%20Riley.mp3
+
+5. "Investigations" Kevin MacLeod (incompetech.com)
+Scene: historical logic recording, replaced in v0.6
+File: investigations-kevin-macleod.mp3
+ISRC: USUAN1100646
+Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100646
+Download: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Investigations.mp3
+
+6. "Dream Culture" Kevin MacLeod (incompetech.com)
+Scene: real-analysis campaign
+File: dream-culture-kevin-macleod.mp3
+ISRC: USUAN1300046
+Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1300046
+Download: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Dream%20Culture.mp3
+
+7. "Cipher" Kevin MacLeod (incompetech.com)
+Scene: number-theory campaign
+File: cipher-kevin-macleod.mp3
+ISRC: USUAN1100844
+Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100844
+Download: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Cipher2.mp3
+
+8. "Enchanted Valley" Kevin MacLeod (incompetech.com)
+Scene: map / minigames (v0.6)
+File: enchanted-valley-kevin-macleod.mp3
+ISRC: USUAN1200093
+Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1200093
+Download: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Enchanted%20Valley.mp3
+
+9. "Magic Forest" Kevin MacLeod (incompetech.com)
+Scene: historical logic recording, replaced in v0.7
+File: magic-forest-kevin-macleod.mp3
+ISRC: USUAN1600044
+Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1600044
+Download: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Magic%20Forest.mp3
+
+10. "Adventures in Adventureland" Kevin MacLeod (incompetech.com)
+Scene: logic campaign (v0.7)
+File: adventures-in-adventureland-kevin-macleod.mp3
+ISRC: USUAN2100029
+Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2100029
+Download: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Adventures%20in%20Adventureland.mp3

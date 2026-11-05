@@ -1,0 +1,25 @@
+/* The old speech-bubble span rules must never give the XP track padding. */
+.hero-yaya .yaya-growth-label .growth-meter{position:relative;display:block;flex:none;box-sizing:border-box;width:100%;height:12px;min-height:12px;margin:3px 0;padding:0;border:1px solid #78974f;border-radius:999px;background:#becf9e;overflow:hidden;box-shadow:inset 0 1px 3px #46662b33}
+.hero-yaya .growth-meter .growth-fill{position:absolute;display:block;left:0;top:0;bottom:0;max-width:100%;height:100%;padding:0;border:0;border-radius:inherit;background:linear-gradient(90deg,#76a947,#b3d574 68%,#f1cf6c);box-shadow:inset 0 1px #ffffff66;transition:width .45s ease}
+.hero-yaya>.yaya-form{animation:yaya-idle 4s ease-in-out infinite!important}
+/* Reserve room for all four Chinese characters, in every fullscreen state. */
+#fullscreen-toggle{width:68px!important;min-width:68px;height:50px!important;padding:5px 6px!important;gap:3px;line-height:1;flex-shrink:0}
+#fullscreen-toggle>.icon{width:22px;height:22px;flex-shrink:0}
+#fullscreen-toggle>.control-caption{display:block;max-width:none;min-height:11px;margin:0;padding:0;font-size:10px!important;line-height:1.1!important;letter-spacing:0;white-space:nowrap;word-break:keep-all;overflow-wrap:normal;flex-shrink:0}
+.home-toolbar .home-tool{width:50px!important;min-width:50px;height:50px!important}
+.home-toolbar .home-tool .control-caption{font-size:9px;white-space:nowrap;line-height:1.2}
+.home-toolbar #fullscreen-toggle{height:50px!important}
+.top-tools #fullscreen-toggle,.battle-header #fullscreen-toggle{height:48px!important}
+@media(max-width:600px){
+  .home-toolbar{gap:5px!important}
+  .home-toolbar .home-tool{width:42px!important;min-width:42px;height:48px!important}
+  #fullscreen-toggle{width:60px!important;min-width:60px;height:48px!important}
+  .home-toolbar #fullscreen-toggle{height:48px!important}
+  #fullscreen-toggle>.icon{width:20px;height:20px}
+  #fullscreen-toggle>.control-caption{font-size:9px!important}
+}
+@media(max-width:370px){
+  .home-toolbar{padding-left:10px!important;padding-right:10px!important;gap:4px!important}
+  .home-toolbar .home-tool{width:38px!important;min-width:38px}
+  #fullscreen-toggle{width:56px!important;min-width:56px}
+}

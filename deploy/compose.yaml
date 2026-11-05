@@ -1,0 +1,40 @@
+services:
+  app:
+    image: ${GARDEN_IMAGE:-lean-garden:0.10.0}
+    restart: unless-stopped
+    init: true
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3210
+      GARDEN_DATA_DIR: /opt/garden/data
+      GARDEN_LEAN_ENV: /opt/garden/deploy/lean-env.json
+    volumes:
+      - progress:/opt/garden/data
+    tmpfs:
+      - /opt/garden/lean/.scratch:uid=10001,gid=10001,mode=0700,size=32m
+    expose: ["3210"]
+    mem_limit: 4g
+    cpus: 3
+    pids_limit: 128
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+  web:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      GARDEN_SITE: ${GARDEN_SITE:-:80}
+    ports:
+      - "${GARDEN_HTTP_PORT:-80}:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - certificates:/data
+      - caddy_config:/config
+volumes:
+  progress:
+  certificates:
+  caddy_config:

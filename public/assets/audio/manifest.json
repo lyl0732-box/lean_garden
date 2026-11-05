@@ -1,0 +1,218 @@
+{
+  "artist": "Kevin MacLeod (incompetech.com)",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "metadataSource": "https://incompetech.com/music/royalty-free/pieces.json",
+  "checked": "2026-10-30",
+  "tracks": [
+    {
+      "scene": "home",
+      "id": "carefree",
+      "title": "Carefree",
+      "artist": "Kevin MacLeod",
+      "url": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1400037",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "src": "/assets/audio/carefree-kevin-macleod.mp3",
+      "downloadUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Carefree.mp3",
+      "isrc": "USUAN1400037",
+      "instruments": "Ukulele, Guitar, Marimba, Glockenspiel, Percussion",
+      "bpm": "96",
+      "officialLength": "00:03:25",
+      "bytes": 6566713,
+      "sha256": "8433b770a630d9b1594fd484442c677907ece899a4d149954cd2e74fd733e311",
+      "licenseChecked": "2026-10-28",
+      "changes": "None: original MP3, no edits or transcoding.",
+      "audio": {
+        "format": "MPEG-1 Layer III",
+        "sampleRates": [
+          44100
+        ],
+        "bitratesKbps": [
+          256
+        ],
+        "channels": [
+          2
+        ],
+        "durationSeconds": 205.14,
+        "frames": 7853,
+        "nonFrameTailBytes": 0
+      }
+    },
+    {
+      "scene": "map",
+      "id": "enchanted-valley",
+      "title": "Enchanted Valley",
+      "artist": "Kevin MacLeod",
+      "url": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1200093",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "src": "/assets/audio/enchanted-valley-kevin-macleod.mp3",
+      "downloadUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Enchanted%20Valley.mp3",
+      "isrc": "USUAN1200093",
+      "instruments": "Celesta, Clarinet, Flute, Alto Flute, Bass Clarinet, Violins, Cellos",
+      "bpm": "117",
+      "officialLength": "00:03:10",
+      "bytes": 7613259,
+      "sha256": "a8db733238ff78fb6a38f1ec802d52efe4cfb7487d4c5a63e50479a8df81eaf9",
+      "licenseChecked": "2026-10-29",
+      "changes": "None: original MP3, no edits or transcoding."
+    },
+    {
+      "scene": "garden",
+      "id": "wholesome",
+      "title": "Wholesome",
+      "artist": "Kevin MacLeod",
+      "url": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1900022",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "src": "/assets/audio/wholesome-kevin-macleod.mp3",
+      "downloadUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Wholesome.mp3",
+      "isrc": "USUAN1900022",
+      "instruments": "Cello, Viola, Marimba, Drums",
+      "bpm": "128",
+      "officialLength": "00:06:04",
+      "bytes": 14556390,
+      "sha256": "9eadc79a1a2cb68cd63be1432ebf8f8ae3387cb9d2e85f9b8dbc74ba5a96b231",
+      "licenseChecked": "2026-10-28",
+      "changes": "None: original MP3, no edits or transcoding.",
+      "audio": {
+        "format": "MPEG-1 Layer III",
+        "sampleRates": [
+          44100
+        ],
+        "bitratesKbps": [
+          320
+        ],
+        "channels": [
+          2
+        ],
+        "durationSeconds": 363.807,
+        "frames": 13927,
+        "nonFrameTailBytes": 0
+      }
+    },
+    {
+      "scene": "n",
+      "id": "life-of-riley",
+      "title": "Life of Riley",
+      "artist": "Kevin MacLeod",
+      "url": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1400054",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "src": "/assets/audio/life-of-riley-kevin-macleod.mp3",
+      "downloadUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Life%20of%20Riley.mp3",
+      "isrc": "USUAN1400054",
+      "instruments": "Glockenspiel, Ukulele, Guitar, Percussion",
+      "bpm": "102",
+      "officialLength": "00:03:55",
+      "bytes": 7533831,
+      "sha256": "1916f05cd1860949f9241e17966d334c39852b531329e4a05802720bb154c564",
+      "licenseChecked": "2026-10-28",
+      "changes": "None: original MP3, no edits or transcoding.",
+      "audio": {
+        "format": "MPEG-1 Layer III",
+        "sampleRates": [
+          44100
+        ],
+        "bitratesKbps": [
+          256
+        ],
+        "channels": [
+          2
+        ],
+        "durationSeconds": 235.363,
+        "frames": 9010,
+        "nonFrameTailBytes": 0
+      }
+    },
+    {
+      "scene": "l",
+      "id": "adventures-in-adventureland",
+      "title": "Adventures in Adventureland",
+      "artist": "Kevin MacLeod",
+      "url": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2100029",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "src": "/assets/audio/adventures-in-adventureland-kevin-macleod.mp3",
+      "downloadUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Adventures%20in%20Adventureland.mp3",
+      "isrc": "USUAN2100029",
+      "instruments": "Harp, Bassoon, Glockenspiel, Percussion, Clarinet, Flutes, Cellos, Basses, Violas, Violins, French Horns, Marimba, Trombones, Bells, Tuba, Trumpets",
+      "bpm": "135",
+      "officialLength": "00:04:21",
+      "feel": "Action, Bright, Grooving",
+      "bytes": 5227256,
+      "sha256": "13cf2a3bed4996331e8dcd8263cbb3a780475f0157889fb16b8e47220f453a2d",
+      "licenseChecked": "2026-10-30",
+      "changes": "None: original MP3, no edits or transcoding."
+    },
+    {
+      "scene": "a",
+      "id": "dream-culture",
+      "title": "Dream Culture",
+      "artist": "Kevin MacLeod",
+      "url": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1300046",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "src": "/assets/audio/dream-culture-kevin-macleod.mp3",
+      "downloadUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Dream%20Culture.mp3",
+      "isrc": "USUAN1300046",
+      "instruments": "Piano, Percussion",
+      "bpm": "70",
+      "officialLength": "00:03:34",
+      "bytes": 8576659,
+      "sha256": "f12cbb52bd4b92bd6cf8a343645567c119627e9cbf98108a3eb6ac2cc275ee46",
+      "licenseChecked": "2026-10-28",
+      "changes": "None: original MP3, no edits or transcoding.",
+      "audio": {
+        "format": "MPEG-1 Layer III",
+        "sampleRates": [
+          44100
+        ],
+        "bitratesKbps": [
+          320
+        ],
+        "channels": [
+          2
+        ],
+        "durationSeconds": 214.361,
+        "frames": 8206,
+        "nonFrameTailBytes": 0
+      }
+    },
+    {
+      "scene": "t",
+      "id": "cipher",
+      "title": "Cipher",
+      "artist": "Kevin MacLeod",
+      "url": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100844",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "src": "/assets/audio/cipher-kevin-macleod.mp3",
+      "downloadUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Cipher2.mp3",
+      "isrc": "USUAN1100844",
+      "instruments": "Synths, Electric Piano, Percussion, Strings",
+      "bpm": "150",
+      "officialLength": "00:03:51",
+      "bytes": 9252699,
+      "sha256": "d3d0614535a61d748e2fd8d5117fc4d781022a7624794802a2462d8af3fdd522",
+      "licenseChecked": "2026-10-28",
+      "changes": "None: original MP3, no edits or transcoding.",
+      "audio": {
+        "format": "MPEG-1 Layer III",
+        "sampleRates": [
+          44100
+        ],
+        "bitratesKbps": [
+          320
+        ],
+        "channels": [
+          2
+        ],
+        "durationSeconds": 231.262,
+        "frames": 8853,
+        "nonFrameTailBytes": 0
+      }
+    }
+  ]
+}

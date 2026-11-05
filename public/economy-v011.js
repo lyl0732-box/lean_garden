@@ -1,0 +1,6 @@
+import {resourceCount} from './shop.js';
+import {icon} from './ui.js';
+export {evolution,evolvedMascot,growthView} from './yaya-forms.js';
+export {shopView} from './shop.js';
+export function energyPill(e){return e?`<button class="energy-pill" data-action="energy" aria-label="活跃度 ${e.energy} / 50"><span>⚡</span><b data-energy-value>${e.energy}</b><small>/50</small></button>`:'';}
+export function energyView(e,adsAvailable,btn,adLabel='广告尚未接入'){const seconds=Math.ceil(e.nextIn/1000),time=`${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`;return `<div class="energy-orb">⚡<b>${e.energy}<small>/50</small></b></div><h2>准备好下一场冒险</h2><p>每开一局消耗 5 活跃度，每 5 分钟恢复 1 点，上限 50 点。未完成的关卡可以免费继续。</p><p class="energy-countdown">${e.energy===50?'活跃度已满，出发吧！':`下 1 点约在 ${time} 后恢复`}</p><p>背包里有 <b>${resourceCount(e,'adSkips')}</b> 张免广告券。</p>${btn('refill-energy','用 1 张免广告券 · 恢复满活跃度','primary wide',e.adSkips<1||e.energy===50?'disabled':'')}${btn('watch-ad',adsAvailable?'看广告 · 恢复满活跃度并获 50 钻石':adLabel,'secondary wide',!adsAvailable||e.energy===50||e.dailyAds.remaining<1?'disabled':'')}<p class="subtle">内测商城每个账号免费领一次 3 张免广告券。免广告券现金专购，不支持钻石兑换。</p>${btn('shop',icon('shop')+' 去星钻小铺','text-button wide')}`;}

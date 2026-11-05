@@ -1,0 +1,26 @@
+{
+  "name": "lean-garden",
+  "version": "0.13.1",
+  "private": true,
+  "type": "module",
+  "description": "Button-driven Lean proof adventure, verified locally by Lean 4",
+  "scripts": {
+    "start": "node server/index.mjs",
+    "test": "node --test --test-concurrency=1 tests/*.test.mjs",
+    "verify:curriculum": "node scripts/verify-all.mjs",
+    "verify:repository": "node scripts/verify-repository.mjs",
+    "verify:states": "node scripts/verify-curriculum.mjs",
+    "build:assets": "node scripts/build-media.mjs",
+    "build:manifest": "node scripts/build-media.mjs --manifest-only",
+    "build:windows": "node scripts/build-windows.mjs",
+    "build:android": "node scripts/build-android.mjs",
+    "build:deploy": "node scripts/package-deploy.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "ffmpeg-static": "5.3.0",
+    "sharp": "0.35.5"
+  }
+}

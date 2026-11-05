@@ -1,0 +1,15 @@
+{$GARDEN_SITE} {
+    encode zstd gzip
+    request_body {
+        max_size 16KB
+    }
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy strict-origin-when-cross-origin
+    }
+    reverse_proxy app:3210 {
+        transport http {
+            response_header_timeout 120s
+        }
+    }
+}

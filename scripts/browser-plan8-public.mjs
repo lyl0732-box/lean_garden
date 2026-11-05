@@ -1,0 +1,8 @@
+import {chromium} from 'file:///D:/claude-code/node_modules/@playwright/cli/node_modules/playwright/index.mjs';import assert from 'node:assert/strict';import {writeFile} from 'node:fs/promises';
+const context=await chromium.launchPersistentContext('C:/Users/Lenovo/.playwright-chrome-profile',{channel:'chrome',headless:true,locale:'zh-CN',viewport:{width:1280,height:800}});const page=await context.newPage();await page.bringToFront();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+try{
+ const response=await page.goto('https://162.14.77.140');assert.equal(response.status(),200);await page.locator('.account-screen,.storybook-home,.resource-boot').first().waitFor({timeout:60000});assert.equal(await page.evaluate(()=>isSecureContext),true);
+ if(await page.locator('[data-auth-update]').count()){await page.locator('[data-auth-update]').click();await page.getByText('已经是最新版本',{exact:false}).waitFor();}
+ const manifest=await page.evaluate(async()=>{const r=await fetch('/client-manifest.json');return await r.json();});assert.equal(manifest.revision,'0.12.0');const health=await page.evaluate(async()=>await(await fetch('/api/health')).json());assert.equal(health.ready,true);await page.waitForTimeout(500);await page.screenshot({path:'artifacts/plan8-public-https.png'});assert.deepEqual(errors,[]);
+ await writeFile('artifacts/plan8-public-report.json',JSON.stringify({date:new Date().toISOString(),url:page.url(),trustedHTTPS:true,secureContext:true,revision:manifest.revision,engineReady:health.ready,resources:manifest.assets.length,errors},null,2));console.log('Public HTTPS and real Lean health verified.');
+}finally{await context.close();}

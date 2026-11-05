@@ -1,0 +1,8 @@
+{
+  "host": "162.14.77.140",
+  "user": "ubuntu",
+  "root": "/home/ubuntu/lean-garden",
+  "key": "deploy/.private/deploy-key.pem",
+  "knownHosts": "deploy/.private/known_hosts",
+  "url": "https://162.14.77.140"
+}

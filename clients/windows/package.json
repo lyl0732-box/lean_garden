@@ -1,0 +1,57 @@
+{
+  "name": "lean-garden-client",
+  "version": "0.13.1",
+  "private": true,
+  "description": "Lean Garden online Windows client",
+  "main": "main.cjs",
+  "author": "Lean Garden",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win nsis --x64"
+  },
+  "devDependencies": {
+    "electron": "45.2.1",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "cn.leangarden.client",
+    "productName": "Lean Garden",
+    "artifactName": "LeanGarden-Setup-${version}.${ext}",
+    "directories": {
+      "output": "../../dist/windows"
+    },
+    "files": [
+      "main.cjs",
+      "preload.cjs",
+      "resource-cache.cjs",
+      "start.html",
+      "icon.png",
+      "portal-world.webp"
+    ],
+    "extraResources": [
+      {
+        "from": "../bundled",
+        "to": "garden-assets",
+        "filter": [
+          "manifest.json",
+          "blobs/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "icon.png",
+      "signExecutable": false
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowElevation": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "证明花园"
+    }
+  }
+}

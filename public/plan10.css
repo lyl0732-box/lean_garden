@@ -1,0 +1,25 @@
+/* The room title already lives in the wooden navigation bar. Resource counters
+   and actions keep their own space, wrapping as groups on narrow screens. */
+.room-shell .room-topbar{height:auto;min-height:82px;padding-block:12px;gap:12px;flex-wrap:wrap}
+.room-topbar .greeting{min-width:0}
+.room-topbar .top-tools{min-width:0;max-width:100%;margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.room-resources,.room-actions{display:flex;align-items:center;gap:6px;min-width:0;flex-wrap:wrap}
+.room-resources>*{flex:none}
+.room-topbar .room-actions .icon-button{width:44px;height:44px;flex:none}
+.room-actions .music-button{font-size:26px}
+.room-topbar .stat-pill b{white-space:nowrap}
+/* The sticky room sign must not cover a dialog's close button. */
+.modal-backdrop{z-index:1000}
+@media(max-width:900px){
+  .room-topbar .greeting{display:none}
+  .room-topbar .top-tools{width:100%;justify-content:space-between}
+  .room-shell .room-topbar{padding-inline:14px}
+}
+@media(max-width:480px){
+  .room-topbar .top-tools{gap:6px}
+  .room-resources{gap:5px}
+  .room-topbar .room-actions{margin-left:auto;gap:3px}
+  .room-topbar .stat-pill{min-width:0;padding:5px 8px}
+}
+.evolved-wand{filter:drop-shadow(0 0 4px var(--wand-color,#c6e78b))}
+.evolved-wand .wand-tip{left:66.6667%;top:11.4286%;width:calc(7px * var(--spell-power));height:calc(7px * var(--spell-power));background:var(--wand-color,#c6e78b);box-shadow:0 0 var(--wand-glow,8px) var(--wand-color,#c6e78b)}

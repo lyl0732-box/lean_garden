@@ -1,0 +1,58 @@
+[
+  {
+    "stage": 1,
+    "file": "public/assets/yaya-v011/01-sprout.png",
+    "prompt": "Use case: stylized-concept. Asset type: transparent full-body game mascot sprite, original cheerful hand-painted cartoon garden game. The reference shows Yaya, a pale-lime bean-shaped plant creature with two broad green sprout leaves, dark oval eyes, peach cheeks, little root feet and friendly smile. Create evolution 1 of 8, the baby sprout: preserve this simple recognizable silhouette and face, give it charming polished storybook shading, thick confident dark-green contours, dewy rounded leaf textures. No armor or grand ornament yet, this is the small lovable beginning. Single character centered, full body visible with generous clear margin for leaves and feet, roughly square canvas. Authentic transparent background and clean alpha, no scenery, no card frame, no letters, no watermark, no ground plane, no other characters. Keep it readable at 180px on a mobile game homepage.",
+    "generator": "built-in image_gen",
+    "transparentBackground": true
+  },
+  {
+    "stage": 2,
+    "file": "public/assets/yaya-v011/02-bloom.png",
+    "prompt": "Use case: stylized-concept. Asset type: transparent full-body evolution sprite for an original cheerful cartoon garden game. Reference image shows baby Yaya: pale-lime bean-shaped plant face, dark oval eyes, peach cheeks, smile, green sprout leaves. Preserve that recognizable facial identity and polished hand-painted casual-game art style, but radically evolve the body, silhouette and equipment. Evolution 2 of 8. Bloom scout. Change the body silhouette into a lively upright little plant with visible leaf arms, a layered skirt of pink-and-cream flower petals, short jade leaf cape and a huge blossoming pink flower crown. Small sunflower-tipped twig wand. Expression curious and brave. Pink/coral accents with green face. This must look markedly more developed than the simple two-leaf bean baby. Single character centered in a square canvas, full body and all wings/weapons/antlers visible, clear generous transparent margin, large readable silhouette at 180px. Confident dark green contours, soft sculpted storybook shading, rich material texture. Authentic transparent alpha background, no scenery, no ground plane, no card frame, no text, no letters, no watermark, no second character.",
+    "generator": "built-in image_gen",
+    "transparentBackground": true
+  },
+  {
+    "stage": 3,
+    "file": "public/assets/yaya-v011/03-ranger.png",
+    "prompt": "Use case: stylized-concept. Asset type: transparent full-body evolution sprite for an original cheerful cartoon garden game. Reference image shows baby Yaya: pale-lime bean-shaped plant face, dark oval eyes, peach cheeks, smile, green sprout leaves. Preserve that recognizable facial identity and polished hand-painted casual-game art style, but radically evolve the body, silhouette and equipment. Evolution 3 of 8. Forest ranger. Taller agile woody trunk body with clearly defined sturdy bark boots, broad oak-leaf shoulder cape and hood, an elegant long bow grown from a vine, a leafy quiver of luminous seed arrows and amber leaf pendant. Jade-green bean face, two sprout leaves remain emerging from hood, same dark oval eyes and peach cheeks. Strong triangular green-and-amber silhouette. Independent adventurous garden hero. Single character centered in a square canvas, full body and all wings/weapons/antlers visible, clear generous transparent margin, large readable silhouette at 180px. Confident dark green contours, soft sculpted storybook shading, rich material texture. Authentic transparent alpha background, no scenery, no ground plane, no card frame, no text, no letters, no watermark, no second character.",
+    "generator": "built-in image_gen",
+    "transparentBackground": true
+  },
+  {
+    "stage": 4,
+    "file": "public/assets/yaya-v011/04-mage.png",
+    "prompt": "Use case: stylized-concept. Asset type: transparent full-body evolution sprite for an original cheerful cartoon garden game. Reference image shows baby Yaya: pale-lime bean-shaped plant face, dark oval eyes, peach cheeks, smile, green sprout leaves. Preserve that recognizable facial identity and polished hand-painted casual-game art style, but radically evolve the body, silhouette and equipment. Evolution 4 of 8. Arcane lotus mage. Distinct wide-brim purple wizard hat shaped from overlapping leaves, glowing violet crystal staff, long blue-purple bell-shaped robe with gold botanical embroidery, orbiting open leaf spellbook and three little rune motes (abstract shapes, no writing). Float a little above tiny root feet. Same pale-lime face with dark oval eyes and peach cheeks, sprout leaves emerge from hat. Purple and sapphire fantasy silhouette, noticeably more spectacular. Single character centered in a square canvas, full body and all wings/weapons/antlers visible, clear generous transparent margin, large readable silhouette at 180px. Confident dark green contours, soft sculpted storybook shading, rich material texture. Authentic transparent alpha background, no scenery, no ground plane, no card frame, no text, no letters, no watermark, no second character.",
+    "generator": "built-in image_gen",
+    "transparentBackground": true
+  },
+  {
+    "stage": 5,
+    "file": "public/assets/yaya-v011/05-knight.png",
+    "prompt": "Use case: stylized-concept. Asset type: transparent full-body evolution sprite for an original cheerful cartoon garden game. Reference image shows baby Yaya: pale-lime bean-shaped plant face, dark oval eyes, peach cheeks, smile, green sprout leaves. Preserve that recognizable facial identity and polished hand-painted casual-game art style, but radically evolve the body, silhouette and equipment. Evolution 5 of 8. Emerald armored guardian. Broad stocky imposing knight silhouette, huge angular emerald leaf armor with elaborate golden veins, leaf crested helmet leaving the familiar pale-lime bean face fully visible, massive luminous translucent leaf shield and chunky golden acorn hammer. Wide armored shoulders, robust bark feet, ruby sun emblem. Cute but powerful champion, about twice the visual mass of mage. Jade, gold and ruby palette. Single character centered in a square canvas, full body and all wings/weapons/antlers visible, clear generous transparent margin, large readable silhouette at 180px. Confident dark green contours, soft sculpted storybook shading, rich material texture. Authentic transparent alpha background, no scenery, no ground plane, no card frame, no text, no letters, no watermark, no second character.",
+    "generator": "built-in image_gen",
+    "transparentBackground": true
+  },
+  {
+    "stage": 6,
+    "file": "public/assets/yaya-v011/06-phoenix.png",
+    "prompt": "Use case: stylized-concept. Asset type: transparent full-body evolution sprite for an original cheerful cartoon garden game. Reference image shows baby Yaya: pale-lime bean-shaped plant face, dark oval eyes, peach cheeks, smile, green sprout leaves. Preserve that recognizable facial identity and polished hand-painted casual-game art style, but radically evolve the body, silhouette and equipment. Evolution 6 of 8. Phoenix-winged plant sovereign. A soaring tall plant spirit with enormous outward-spread teal and ivory phoenix wings made of layered long leaves, bright sun blossom crown, ornate white-and-gold chest armor, long flowing turquoise leaf tail feathers and a luminous curved vine staff. Same friendly oval eyes, peach cheeks and pale-green bean face. Magnificent angular wing silhouette dramatically unlike a knight, luminous dew jewels. Single character centered in a square canvas, full body and all wings/weapons/antlers visible, clear generous transparent margin, large readable silhouette at 180px. Confident dark green contours, soft sculpted storybook shading, rich material texture. Authentic transparent alpha background, no scenery, no ground plane, no card frame, no text, no letters, no watermark, no second character.",
+    "generator": "built-in image_gen",
+    "transparentBackground": true
+  },
+  {
+    "stage": 7,
+    "file": "public/assets/yaya-v011/07-dragon.png",
+    "prompt": "Use case: stylized-concept. Asset type: transparent full-body evolution sprite for an original cheerful cartoon garden game. Reference image shows baby Yaya: pale-lime bean-shaped plant face, dark oval eyes, peach cheeks, smile, green sprout leaves. Preserve that recognizable facial identity and polished hand-painted casual-game art style, but radically evolve the body, silhouette and equipment. Evolution 7 of 8. Celestial nature dragon evolution of the plant mascot. A powerful cute serpentine leaf dragon coiled into an elegant upright S shape, four bark claws, jade scale leaves, huge branching golden antlers and long luminous vine whiskers. Familiar pale-green bean face with dark oval eyes, peach cheeks and friendly determined smile preserved as the dragon head identity. Emerald, cobalt and gold armor, cloudlike stylized leaf tufts, floating jade orb held by front claws. A complete transformation with striking dragon silhouette, no human body. Single character centered in a square canvas, full body and all wings/weapons/antlers visible, clear generous transparent margin, large readable silhouette at 180px. Confident dark green contours, soft sculpted storybook shading, rich material texture. Authentic transparent alpha background, no scenery, no ground plane, no card frame, no text, no letters, no watermark, no second character.",
+    "generator": "built-in image_gen",
+    "transparentBackground": true
+  },
+  {
+    "stage": 8,
+    "file": "public/assets/yaya-v011/08-celestial.png",
+    "prompt": "Use case: stylized-concept. Asset type: transparent full-body evolution sprite for an original cheerful cartoon garden game. Reference image shows baby Yaya: pale-lime bean-shaped plant face, dark oval eyes, peach cheeks, smile, green sprout leaves. Preserve that recognizable facial identity and polished hand-painted casual-game art style, but radically evolve the body, silhouette and equipment. Evolution 8 of 8. Ultimate cosmic world-tree deity, the final evolution of the cute plant mascot. Massive floating tree titan silhouette: familiar friendly pale-lime bean face set in an ornate golden trunk mask, grand branching crown covered in luminous turquoise leaves and pink starlight blossoms, four magnificent curving branch arms with jeweled golden armor, flowing root tendrils forming a floating skirt, two nested cosmic golden rings and floating miniature star crystals around the character. Rich emerald, turquoise, deep indigo and radiant gold. Majestic and adorable rather than scary; immediately far more spectacular than every earlier evolution. All props part of this one character, no landscape. Single character centered in a square canvas, full body and all wings/weapons/antlers visible, clear generous transparent margin, large readable silhouette at 180px. Confident dark green contours, soft sculpted storybook shading, rich material texture. Authentic transparent alpha background, no scenery, no ground plane, no card frame, no text, no letters, no watermark, no second character.",
+    "generator": "built-in image_gen",
+    "transparentBackground": true
+  }
+]

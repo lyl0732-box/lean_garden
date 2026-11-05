@@ -1,0 +1,28 @@
+/* Room backgrounds fill the window; readable content keeps its own measure. */
+.main-shell.room-shell{width:100%;max-width:none;margin:0!important}
+.room-shell>.page-content{width:100%;max-width:1600px}
+
+/* Teaching retains the same live target animation as ordinary battles. */
+.guided-lesson .spell-target{animation:target-tremble .24s ease-in-out infinite}
+.reduce-motion .guided-lesson .spell-target,.guided-lesson.reduce-motion .spell-target{animation:none}
+@media(prefers-reduced-motion:reduce){.guided-lesson .spell-target{animation:none}}
+
+/* The first three lessons start freely; Yaya offers help on request. */
+#tutorial-helper{position:fixed;left:max(10px,env(safe-area-inset-left));bottom:max(10px,env(safe-area-inset-bottom));z-index:18000;pointer-events:none}
+.tutorial-help-button{display:flex;align-items:center;gap:0;padding:0;border:0;background:none;box-shadow:none;color:#365b35;cursor:pointer;pointer-events:auto;animation:yaya-help-hop 1.7s ease-in-out infinite;transform-origin:bottom center}
+.tutorial-help-button:focus-visible{outline:3px solid #d2a443;outline-offset:5px;border-radius:20px}
+.tutorial-help-avatar{display:block;width:82px;filter:drop-shadow(0 5px 4px #1b3b3333)}
+.tutorial-help-avatar .wand-charge,.tutorial-exit-avatar .wand-charge{display:none}
+.tutorial-help-bubble{position:relative;display:block;margin-left:-15px;padding:11px 17px 12px 14px;border:2px solid #8aac5c;border-radius:19px 19px 19px 5px;background:linear-gradient(135deg,#fffbe5,#e6f3c9);box-shadow:0 4px 14px #243e3529;text-align:left;white-space:nowrap}
+.tutorial-help-bubble small{display:block;margin-bottom:3px;font-size:10px;color:#70874a}.tutorial-help-bubble b{font-size:15px}.tutorial-help-bubble>span{position:absolute;right:-6px;top:-12px;color:#dfb444;font-size:22px}
+.tutorial-available .battle-layout{padding-bottom:115px}.tutorial-available .wizard-guide{visibility:hidden}
+.tutorial-speech{pointer-events:auto}
+#tutorial-exit{position:fixed;inset:0;z-index:27000;pointer-events:none}
+.tutorial-exit-backdrop{position:absolute;inset:0;pointer-events:auto;background:#102c3b33;display:flex;align-items:flex-end;padding:max(14px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+.tutorial-exit-dialog{display:flex;align-items:center;gap:6px;width:min(440px,100%);padding:20px 20px 20px 5px;border:2px solid #d5b96d;border-radius:25px;background:linear-gradient(125deg,#fffbe7,#e6edcf);color:#42613d;box-shadow:0 12px 60px #0c233c77;animation:tutorial-exit-arrive .2s ease-out}
+.tutorial-exit-avatar{display:block;width:90px;flex-shrink:0}.tutorial-exit-dialog small{font-size:11px;color:#94733e}.tutorial-exit-dialog h2{margin:5px 0 8px;font-size:21px}.tutorial-exit-dialog p{margin:0;font-size:12px;line-height:1.8}.tutorial-exit-actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}.tutorial-exit-actions button{font-size:13px;padding:10px 14px}
+body.tutorial-exit-open{overflow:hidden}
+@keyframes yaya-help-hop{0%,38%,72%,100%{transform:translateY(0) rotate(0)}48%{transform:translateY(-10px) rotate(-3deg)}60%{transform:translateY(-3px) rotate(2deg)}}
+@keyframes tutorial-exit-arrive{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.reduce-motion .tutorial-help-button,.reduce-motion .tutorial-exit-dialog{animation:none}
+@media(prefers-reduced-motion:reduce){.tutorial-help-button,.tutorial-exit-dialog{animation:none}}

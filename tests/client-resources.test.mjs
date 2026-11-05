@@ -1,0 +1,21 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {mkdtemp,mkdir,writeFile,readFile} from 'node:fs/promises';import os from 'node:os';import path from 'node:path';import {createHash} from 'node:crypto';
+import resources from '../clients/windows/resource-cache.cjs';
+const {prepareResources,validateManifest}=resources;
+const asset=(url,body)=>({url,bytes:Buffer.byteLength(body),sha256:createHash('sha256').update(body).digest('hex'),mime:'text/javascript'});
+test('native client uses bundled files, fetches only changed hashes once, rejects corruption and does not publish partial updates',async()=>{
+  const root=await mkdtemp(path.join(os.tmpdir(),'garden-assets-')),bundle=path.join(root,'bundle'),cache=path.join(root,'cache');await mkdir(path.join(bundle,'blobs'),{recursive:true});
+  const bodies=new Map([['/index.html','<html></html>'],['/boot.js','export const version=1;'],['/music.mp3','test-audio']]);
+  let manifest={schema:1,nativeABI:1,revision:'one',assets:[...bodies].map(([url,body])=>asset(url,body))};
+  for(const a of manifest.assets)await writeFile(path.join(bundle,'blobs',a.sha256),bodies.get(a.url));
+  const requests=[];let corrupt=false;
+  const fetcher=async url=>{const u=new URL(url);requests.push(u.pathname);return new Response(u.pathname==='/client-manifest.json'?JSON.stringify(manifest):corrupt?'corrupt':bodies.get(u.pathname));};
+  const args={origin:'http://garden.example',bundle,cache,fetcher};
+  const first=await prepareResources(args);assert.equal(first.stats.bundled,3);assert.equal(first.stats.downloadBytes,0);assert.deepEqual(requests,['/client-manifest.json']);
+  bodies.set('/boot.js','export const version=2;');manifest={...manifest,revision:'two',assets:[...bodies].map(([url,body])=>asset(url,body))};requests.length=0;
+  const second=await prepareResources(args);assert.equal(second.stats.downloaded,1);assert.deepEqual(requests,['/client-manifest.json','/boot.js']);assert.equal(await readFile(second.files.get('/boot.js').file,'utf8'),bodies.get('/boot.js'));
+  requests.length=0;const third=await prepareResources(args);assert.equal(third.stats.cached,1);assert.deepEqual(requests,['/client-manifest.json']);
+  bodies.set('/boot.js','export const version=3;');manifest={...manifest,revision:'three',assets:[...bodies].map(([url,body])=>asset(url,body))};corrupt=true;
+  await assert.rejects(prepareResources(args),/校验失败|超出清单/);assert.equal(third.manifest.revision,'two');assert.equal((await readFile(path.join(cache,'last-check.json'),'utf8')).includes('"two"'),true);
+  for(const url of ['/../secret','/a/./b','https://other.example/file','/api?token=x'])assert.throws(()=>validateManifest({...manifest,assets:[...manifest.assets,asset(url,'a')]}));
+  assert.throws(()=>validateManifest({...manifest,nativeABI:2}));
+});

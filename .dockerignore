@@ -1,0 +1,17 @@
+**/node_modules
+**/.git
+lean/.lake
+lean/.scratch
+data
+logs
+artifacts
+dist
+clients
+deploy/lean-env.json
+deploy/.private
+任务清单
+public/assets/garden-world.png
+public/assets/story/*.png
+public/assets/audio/*.mp3
+*.cmd
+*.ps1

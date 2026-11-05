@@ -1,0 +1,6 @@
+import {chromium} from 'file:///D:/claude-code/node_modules/@playwright/cli/node_modules/playwright/index.mjs';import assert from 'node:assert/strict';import {writeFile} from 'node:fs/promises';
+const context=await chromium.launchPersistentContext('C:/Users/Lenovo/.playwright-chrome-profile',{channel:'chrome',headless:true,locale:'zh-CN',viewport:{width:390,height:844}});const page=await context.newPage();await page.bringToFront();const errors=[],checks=[];page.on('pageerror',e=>errors.push(e.message));
+try{for(const [i,url]of ['http://localhost:3210','http://100.83.142.93:3210','http://desktop-n9bri0f-2.tail91dba6.ts.net:3210'].entries()){
+  await page.goto(url);await page.locator('.account-form').waitFor();assert.equal(await page.locator('[name=username]').count(),1);assert.equal(await page.locator('[name=password]').count(),1);assert.equal(await page.locator('#server').count(),0);
+  await page.screenshot({path:`artifacts/plan7-live-login-${i}.png`});checks.push({url,loginVisible:true,noNativeConnectionScreen:true});
+}assert.deepEqual(errors,[]);await writeFile('artifacts/browser-live-plan7-report.json',JSON.stringify({date:new Date().toISOString(),readOnly:true,checks,errors,remoteLaptopTested:false},null,2));console.log(checks);}finally{await context.close();}

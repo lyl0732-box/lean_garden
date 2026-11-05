@@ -1,0 +1,66 @@
+[
+  {
+    "stage": 1,
+    "file": "public/assets/yaya-v0111/01-sprout.png",
+    "source": "public/assets/yaya-v011/01-sprout.png",
+    "prompt": "Reuse the accepted original baby Yaya unchanged as the shared identity reference.",
+    "generator": "original built-in image_gen asset, reused",
+    "transparentBackground": true
+  },
+  {
+    "stage": 2,
+    "file": "public/assets/yaya-v0111/02-bud.png",
+    "source": "C:/Users/Lenovo/.codex/generated_images/01a151dc-872f-7e41-b0f2-826bb95596ba/exec-0ffbaa01-672b-4622-95a0-a56430d0334b.png",
+    "prompt": "Edit the supplied image as a transparent PNG game sprite. Image 1 is the exact identity and design to preserve: Yaya, a pale lime-green plump bean-shaped sprout with ONE continuous round head-and-body, two black oval eyes with white highlights, pink cheek circles, an open happy smile, two little green oval feet, and two large dew-covered leaf sprouts on its head. Preserve its species, face, color palette, proportions, front-facing pose, painterly cartoon rendering and dark-green outline. This is stage 2 of 8, a TINY evolutionary step from a bare sprout, not a magical hero. Change ONLY this: grow a SINGLE very small closed pale-yellow flower bud between its existing two head leaves, on a short green stalk, just 8% of body height. Keep both original big leaves fully recognizable, and keep the rest of the character essentially unchanged. No hat, crown, clothes, cape, weapon, magic, extra limbs or aura. Full body centered, same canvas framing, feet and leaves fully visible, genuinely transparent alpha background with no checkerboard or scenery. No text, numbers, border, floor or watermark.",
+    "generator": "built-in image_gen edit",
+    "transparentBackground": true
+  },
+  {
+    "stage": 3,
+    "file": "public/assets/yaya-v0111/03-bloom.png",
+    "source": "C:/Users/Lenovo/.codex/generated_images/01a151dc-872f-7e41-b0f2-826bb95596ba/exec-651a31b4-dc74-4ca1-ba81-b5784108091a.png",
+    "prompt": "Edit the supplied transparent game sprite, which is Yaya stage 2. Make stage 3 of an eight-step gently progressive evolution. Preserve EXACTLY the same recognizable pale-lime plump bean/sprout creature: one continuous head-and-body without a neck, same black oval eyes/highlights, pink cheek circles, happy open smile, two little oval feet, and especially the SAME two large green dew-covered leaves on its head. Preserve front-facing pose, proportions, green outline, soft painterly cartoon style, centered framing and transparent alpha. Change only two modest details: open the existing tiny yellow bud between its head leaves into one small five-petal ivory-yellow blossom, about 10% of the creature's body width; add a simple narrow collar made of three small overlapping green leaves just BELOW the smile, wrapping the round body gently, without covering the face. This must still look like an ordinary baby sprout with a tiny flower, only a little more developed than stage 2. No crown, royal costume, hat, cloak, wand, magical effects, wings, extra species, elongated human torso or legs. Full body and all leaves/feet visible, same canvas, generous but not huge transparent margins. No text, labels, floor, border or watermark.",
+    "generator": "built-in image_gen edit",
+    "transparentBackground": true
+  },
+  {
+    "stage": 4,
+    "file": "public/assets/yaya-v0111/04-cape.png",
+    "source": "C:/Users/Lenovo/.codex/generated_images/01a151dc-872f-7e41-b0f2-826bb95596ba/exec-b63d846c-bb06-4a5b-90b0-1ff8827fea77.png",
+    "prompt": "Edit the supplied transparent game sprite, Yaya stage 3, into stage 4 of an eight-step gently progressive evolution. Preserve EXACTLY this same sprout creature: pale lime green, one continuous plump bean-shaped head/body without neck, same black oval eyes and highlights, round rosy cheeks, happy open smile, two short oval feet, SAME two big dew-covered leaves and small ivory five-petal flower between them. Same frontal viewpoint, proportions, dark green outline and soft painterly game art. Change ONLY the three-leaf collar into a short overlapping-leaf shoulder cape that drapes only around the sides of the lower body, adding one small warm-yellow flower clasp below the smile. Leave most of the bare green belly and both feet visible. Cape green only, with simple leaf veins, not ornate. This is a modest garden companion, just one small step more equipped than stage 3. No hat, staff, book, gems, metal armor, magic glow, crown, wings, dragon, human torso or long legs. Full body centered with modest transparent margins; absolutely transparent alpha background, no floor, scenery, text or watermark.",
+    "generator": "built-in image_gen edit",
+    "transparentBackground": true
+  },
+  {
+    "stage": 5,
+    "file": "public/assets/yaya-v0111/05-apprentice.png",
+    "source": "C:/Users/Lenovo/.codex/generated_images/01a151dc-872f-7e41-b0f2-826bb95596ba/exec-61a9a44c-9761-4863-90a4-4eed5c46ebd9.png",
+    "prompt": "Edit this exact transparent Yaya stage-4 sprite into stage 5 of 8: the same little sprout beginning to learn magic. Identity invariants: keep the SAME one-piece round pale-lime bean body and face, no separate human head or neck, black oval eyes with white catchlights, peach-pink cheek circles, open happy smile, short oval green feet. Keep the two LARGE dewy green head leaves, tiny ivory-yellow head flower, and the simple green leaf cape with yellow flower clasp from the input. Keep camera, proportions, painterly cartoon shading and dark-green outline. Add only modest beginner accessories: a SMALL soft lavender pointed apprentice cap tucked at the base of and BEHIND the head leaves so both large leaves and the little flower stay fully visible; cap no wider than half the body, plain with a thin muted yellow fabric band. Add a plain short brown twig wand at one side, only half the body height, held by a tiny round green hand emerging just from under the cape. The cap and twig must look handmade and humble, no crystals or magic. Most green round belly stays bare. One small step beyond stage 4, not an ornate wizard. No robe, royal crown, armor, giant staff, book, glow, wings, halos or deity imagery. Full body centered, all feet and leaves visible on genuinely transparent alpha with same framing. No scenery, floor, labels, text or watermark.",
+    "generator": "built-in image_gen edit",
+    "transparentBackground": true
+  },
+  {
+    "stage": 6,
+    "file": "public/assets/yaya-v0111/06-mage.png",
+    "source": "C:/Users/Lenovo/.codex/generated_images/01a151dc-872f-7e41-b0f2-826bb95596ba/exec-f2e2a122-0c5d-4a0d-bec5-b0c8cbe1eb87.png",
+    "prompt": "Edit the supplied transparent Yaya stage-5 sprite into stage 6 of 8. Make only ONE gradual equipment upgrade, keeping the SAME creature, pose, scale and species. Essential identity must be identical: one continuous plump lime-green bean head-and-body without neck or humanoid torso, black oval eyes with white highlights, round peach blush, cheerful open smile, green oval feet, TWO large recognizable dewy head leaves and the small ivory flower between them. Preserve the green leaf cape and yellow flower clasp. Upgrade the existing small lavender apprentice cap into a slightly fuller soft purple cap with a short drooping tip and narrow gold-yellow fabric band; both big leaves and the little flower remain completely visible growing out above it. Add a thin lavender lining only along the edges of the existing green leaf cape, which remains short and open at front with most of the bare green belly visible. Upgrade the plain twig wand into the SAME short wooden wand, adding one SMALL purple crystal bud held by two little green leaves at its tip. Crystal should only have a tiny soft highlight, no glowing aura. No new book yet, no embroidery yet. Still a lovable simple garden apprentice, not a heroic wizard. NO wings, crown, armor, halo, flying, species change, long limbs, long robe or rings. Full body centered, painterly cartoon matching the input, clean green outline, transparent alpha background. No floor, scenery, lettering, frame or watermark.",
+    "generator": "built-in image_gen edit",
+    "transparentBackground": true
+  },
+  {
+    "stage": 7,
+    "file": "public/assets/yaya-v0111/07-scholar.png",
+    "source": "C:/Users/Lenovo/.codex/generated_images/01a151dc-872f-7e41-b0f2-826bb95596ba/exec-4190319a-f073-4b06-a89c-673d6a6678b9.png",
+    "prompt": "Edit the supplied transparent Yaya stage-6 sprite into stage 7 of eight. The SAME sprout has gained a little knowledge, not become another species. Keep EXACTLY its single pale-lime round bean head-and-body, black oval eyes with white highlights, peach cheek circles, happy open smile, two short oval feet, the TWO large dewy leaf sprouts and their small ivory five-petal flower. Keep front view and face/body proportions unchanged. Most of the green bean body and feet must remain visible. Keep the short brown twig staff with small violet crystal held in little green hand. Give the existing soft violet cap a slightly wider gently curved brim, still tucked at the base of the two big leaves, with a subtle gold leaf stitch on its simple band. Develop the same short green leaf cape by adding a second soft violet cloth layer underneath, visible only along the sides, and three small gold leaf stitches on the outer edges. Keep its yellow flower clasp below the smile. Add one small CLOSED green pocket spellbook with a simple gold leaf emblem, held in a little green hand at the other side, not floating. This should read as a friendly garden scholar, only modestly more detailed than stage 6. No large robe hiding the body, no taller humanoid body, no floating effects, wings, dragon, crown, armor, halo, constellations, deity anatomy or oversized weapon. Maintain soft hand-painted cartoon rendering, dark green contour, same framing with full leaves and feet in view. Genuinely transparent alpha, no ground plane, scenery, text, card border or watermark.",
+    "generator": "built-in image_gen edit",
+    "transparentBackground": true
+  },
+  {
+    "stage": 8,
+    "file": "public/assets/yaya-v0111/08-sage.png",
+    "source": "C:/Users/Lenovo/.codex/generated_images/01a151dc-872f-7e41-b0f2-826bb95596ba/exec-deba33fb-8b51-48a0-b263-40acbe694284.png",
+    "prompt": "Edit the supplied transparent Yaya stage-7 sprite into stage 8 of eight, the final gentle evolution: an accomplished LITTLE GARDEN MAGE, only one incremental step beyond stage 7. The same exact familiar Yaya must remain unmistakable. Preserve its one continuous pale-lime round bean head-and-body without a neck, huge green dew-covered TWO head leaves, tiny ivory head flower, black oval eyes and catchlights, rosy circles on cheeks, happy open smile, tiny green hands and two short oval feet. Keep pose and proportions and rounded species identical, no separate humanoid head/torso. Keep the same violet soft cap, green leaf cape with violet underlayer, yellow flower clasp, small wood-and-leaf crystal wand, and small green book in the SAME sides as input. Upgrade ONLY the accessories modestly: add a slim gold embroidered edge and a single small violet jewel to the cap band; add a few tasteful gold leaf stitches to the violet cape lining, keeping the green leaf layer and round bare belly very visible; make the wand crystal a little more faceted and frame it with three small green leaves; open the small held green book to two cream pages with simple abstract leaf strokes, no readable text. Allow just two tiny warm sparkles next to the crystal, no surrounding aura. The total decoration must stay restrained, no stronger than a charming purple-hatted fantasy garden teacher. This is NOT a god, monster, winged hero or different plant species. No huge robe, armor, crown, giant magic circles, floating books, wings, dragon, celestial backdrop or long limbs. Same soft hand-painted cartoon game rendering and dark green outline, full body centered and fully visible in matching frame, truly transparent alpha background. No scenery, ground, border, labels or watermark.",
+    "generator": "built-in image_gen edit",
+    "transparentBackground": true
+  }
+]
