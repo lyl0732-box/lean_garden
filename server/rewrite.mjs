@@ -10,7 +10,9 @@ export function repository(profile,level,goals,skill='rw'){
     // The generic axiom already infers n from the chosen proposition. The
     // authored `... n` action must not create a second copy of this same card.
     if(cardId==='succ_ne'&&/^Nat\.succ_ne_zero(?:\s+[\p{L}\p{N}_']+)?$/u.test(term))term='Nat.succ_ne_zero';
-    if(cardId==='add_comm'&&/^Nat\.add_comm\b/.test(term))term='Nat.add_comm';
+    // Arguments select a use of a card, not a new card. Keep authored actions
+    // for saved proofs; precise parameters belong in the rewrite editor.
+    if(['add_comm','mul_comm'].includes(cardId)&&new RegExp('^Nat\\.'+cardId+'\\b').test(term))term='Nat.'+cardId;
     if(seen.has(term))return;seen.add(term);
     const c=cards.find(c=>c.id===cardId);
     entries.push({id:`${skill}-${entries.length}`,term,cardId,kind:kind==='hypothesis'?kind:c?.kind||kind,name:label||c?.name||term,formula:formula||c?.formula||c?.example||term});
@@ -48,11 +50,5 @@ export function selectedApply(repo,selection){
 export function selectedInduction(goals,selection){
   if(!goals[0]?.hypotheses.some(h=>h.name===selection?.variable&&h.isNat&&safeName(h.name)))return null;
   return{kind:'induction',variable:selection.variable,code:`induction ${selection.variable} using Nat.rec with\n| zero\n| succ k ih`};
-}
-export function missingRewrites(level,codes){
-  return(level.requiredRewrites||[]).filter(term=>!codes.flatMap(c=>c.split('\n')).some(code=>{
-    const m=/^(?:rewrite|nth_rewrite \d+|garden_strict_rw(?: \(occs := \[[\d, ]+\]\))?|garden_repeat_rewrite) \[([^\]]+)\]$/.exec(code);
-    return m&&m[1].split(',').some(s=>s.trim().replace(/^←\s*/,'')===term);
-  }));
 }
 export function introductions(profile){return profile.isPractice?[]:[...unlocked(profile)].filter(id=>!(profile.introduced||[]).includes(id));}

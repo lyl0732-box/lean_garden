@@ -1,6 +1,6 @@
 {
   "name": "lean-garden-client",
-  "version": "0.13.1",
+  "version": "0.13.3",
   "private": true,
   "description": "Lean Garden online Windows client",
   "main": "main.cjs",
@@ -46,7 +46,8 @@
       "signExecutable": false
     },
     "nsis": {
-      "oneClick": true,
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
       "perMachine": false,
       "allowElevation": false,
       "createDesktopShortcut": true,

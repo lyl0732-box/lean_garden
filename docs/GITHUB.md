@@ -36,4 +36,6 @@ Android 工程固定 compileSdk／targetSdk 36、buildTools 36.0.0、Gradle 8.11
 
 ## 更新仓库与服务器
 
+按用户要求，每次修正完成并通过相关验证后，都提交并推送到本仓库；项目协作规则记在根目录 [AGENTS.md](../AGENTS.md)。
+
 先运行相应验证，`git add` 后执行 `node scripts/check-git-export.mjs` 检查暂存区，再提交和推送。这个检查不会连接服务器或修改账号。上传 GitHub 不等于发布游戏；根目录的云端推送脚本另行部署代码，并排除数据库和私钥。

@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { levels, chapters, cards, campaign, byId, canEnter, unlocked, actionsFor, publicLevel } from './content.mjs';
 import { checkLean, sourceFor, root, engineHealth } from './lean.mjs';
 import { initStore, getProfile, profileById, save, exclusive } from './store.mjs';
-import { repository, selectedRewrite, selectedApply, selectedInduction, missingRewrites, introductions } from './rewrite.mjs';
+import { repository, selectedRewrite, selectedApply, selectedInduction, introductions } from './rewrite.mjs';
 import { nextHint } from './hints.mjs';
 import {activeProfile} from './freeplay.mjs';
 import {explainLeanError} from './error-guide.mjs';
@@ -41,7 +41,9 @@ function statePayload(level,profile,attempt,result) {
   const actions=actionsFor(profile,level).filter(a=>a.skill!=='use').map(a=>({...a,effectTarget:actionTarget(a,result.goals)}));
   if(unlocked(profile).has('use'))actions.push({id:'use-manual',skill:'use',label:'亲手构造见证',effectTarget:'goal'});
   for(const skill of ['rw','apply','induction'])if(unlocked(profile).has(skill)&&!actions.some(a=>a.skill===skill))actions.push({id:`${skill}-selector`,skill,label:'选择使用对象'});
-  return {level:publicLevel(level,profile),attempt,proof,goals:result.goals,complete:result.complete,elapsed:result.elapsed,actions,repository:repo,applyRepository:repository(profile,level,result.goals,'apply'),introductions:introductions(profile),pendingTopics:pendingTopics(profile),requiredRewrites:missingRewrites(level,proof),progress:summary(profile)};
+  // Lean's strict rfl checks the current written equality, independently of
+  // the reference route. Keep the legacy field empty for older clients.
+  return {level:publicLevel(level,profile),attempt,proof,goals:result.goals,complete:result.complete,elapsed:result.elapsed,actions,repository:repo,applyRepository:repository(profile,level,result.goals,'apply'),introductions:introductions(profile),pendingTopics:pendingTopics(profile),requiredRewrites:[],progress:summary(profile)};
 }
 async function readBody(req) {
   let size=0; const chunks=[];
@@ -229,16 +231,11 @@ export async function createServer({allowGuestForTests=false,publicRoot,manageme
               const action=actionsFor(profile,level).find(a=>a.id===body.action);
               if(!action)throw fail(403,'这张卡尚未解锁，或不属于本关。');
               if(['rw','apply','induction','use'].includes(action.skill))throw fail(400,'请完成技能选择流程；use 的见证需要亲手填写。');
-              if(action.skill==='rfl'&&missingRewrites(level,codesFor(level,attempt.steps)).length)
-                throw fail(409,'本关先练习用 rw 改写指定定理，再用 rfl 收尾。');
               attempt.steps.push(action.id);
             }
           } else throw fail(404,'没有这个接口。');
           const result={...await checkLean(level,codesFor(level,attempt.steps))};engineFailure(result);
           if(profile.isPractice&&expireFreeplay(owner)){await save();throw Object.assign(fail(403,'自由选关时间已到，已退出自由模式，练习记录已保留。'),{code:'FREEPLAY_EXPIRED'});}
-          if(result.complete&&missingRewrites(level,codesFor(level,attempt.steps)).length) {
-            result.ok=false;result.errors=['本关需要先在目标中改写：'+missingRewrites(level,codesFor(level,attempt.steps)).join('、')];
-          }
           attempt.revision++;
           if(!result.ok) {
             if(url.pathname==='/api/level/step')attempt.steps.pop();

@@ -2,6 +2,8 @@
 import hashlib,json,os,re,shutil,subprocess,sys,tarfile,time,urllib.request
 from pathlib import Path
 ROOT=Path('/home/ubuntu/lean-garden')
+HEALTH_PORT=int(sys.argv[2])
+if not 1024<=HEALTH_PORT<=65535:raise ValueError('Invalid health port')
 if not re.fullmatch(r'[a-zA-Z0-9-]+',sys.argv[1]): raise ValueError('Invalid upload id')
 incoming=ROOT/'incoming'/sys.argv[1]
 manifest=json.loads((incoming/'manifest.json').read_text())
@@ -57,7 +59,7 @@ try:
     ready=False
     for _ in range(40):
         try:
-            with urllib.request.urlopen('http://127.0.0.1:3210/api/health',timeout=8) as r:ready=json.load(r).get('ready') is True
+            with urllib.request.urlopen(f'http://127.0.0.1:{HEALTH_PORT}/api/health',timeout=8) as r:ready=json.load(r).get('ready') is True
             if ready:break
         except Exception:pass
         time.sleep(1)

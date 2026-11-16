@@ -5,6 +5,7 @@ const options=['-i',key,'-o','BatchMode=yes','-o','StrictHostKeyChecking=yes','-
 const ssh=command=>execFileSync('ssh',[...options,remote,command],{encoding:'utf8',windowsHide:true,maxBuffer:4*1048576});
 async function run(file,args){await new Promise((resolve,reject)=>{const p=spawn(file,args,{cwd:file==='lake'?path.join(root,'lean'):root,windowsHide:true,stdio:'inherit'});p.on('error',reject);p.on('exit',c=>c===0?resolve():reject(new Error(file+' exited '+c)));});}
 if(!/^[a-zA-Z0-9.-]+$/.test(config.host)||!/^[a-zA-Z0-9_-]+$/.test(config.user)||config.root!=='/home/ubuntu/lean-garden')throw Error('Invalid Linux target');
+if(!Number.isInteger(config.port)||config.port<1024||config.port>65535)throw Error('Invalid Linux service port');
 await stat(key);let previous={files:[]};try{previous=JSON.parse(ssh('cat '+config.root+'/inventory.json 2>/dev/null || cat '+config.root+'/current/.manifest.json 2>/dev/null'));}catch{}
 const old=new Map(previous.files.map(f=>[f.path,f.sha256])),client=JSON.parse(await readFile('public/client-manifest.json','utf8'));
 const sources=new Map(client.assets.map(a=>['public'+a.url,'public'+a.url]));sources.set('public/client-manifest.json','public/client-manifest.json');sources.set('package.json','package.json');sources.set('scripts/create-admin.mjs','scripts/create-admin.mjs');
@@ -22,6 +23,6 @@ const report={revision:version,files,changedFiles:changed.length,uploadedBytes:(
 console.log('Uploading',changed.length,'changed files,',(report.uploadedBytes/1048576).toFixed(2),'MiB. Player data is excluded.');
 const target=config.root+'/incoming/'+id;ssh('mkdir -p '+target);
 await run('scp',[...options,archive,path.join(stage,'manifest.json'),'deploy/apply-update.py',remote+':'+target+'/']);
-console.log(ssh('python3 '+target+'/apply-update.py '+id));
+console.log(ssh('python3 '+target+'/apply-update.py '+id+' '+config.port));
 await writeFile('artifacts/linux-last-push.json',JSON.stringify({...report,date:new Date().toISOString(),url:config.url},null,2));
 console.log('Ready:',config.url);

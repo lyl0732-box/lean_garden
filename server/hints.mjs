@@ -1,5 +1,5 @@
 import {actionsFor} from './content.mjs';
-import {repository, selectedInduction, missingRewrites} from './rewrite.mjs';
+import {repository, selectedInduction} from './rewrite.mjs';
 
 const kinds={definition:'定义',theorem:'定理',axiom:'公理'};
 // A single explicit occurrence is the same operation as the default first match.
@@ -40,7 +40,7 @@ export function nextHint(profile,level,codes,goals,count){
   // command unless the player's actual sequence matches that reference.
   if(!onPath){
     const equality=/^(.+) = (.+)$/s.exec(goal.target);
-    if(equality&&equality[1]===equality[2]&&!missingRewrites(level,codes).length){
+    if(equality&&equality[1]===equality[2]){
       const action=actions.find(a=>a.skill==='rfl');
       if(action){suggestion={skill:'rfl',action:action.id};steps=['目标两边已经一样了。','点击 rfl，为这个分支收尾。'];}
     }

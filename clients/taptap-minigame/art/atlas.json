@@ -1,0 +1,94 @@
+{
+  "source": "APK original DOM/CSS and SVG assets",
+  "home": {
+    "title": "home-title.png",
+    "adventure": {
+      "label": "door-adventure-label.png",
+      "emblem": "door-adventure-emblem.png",
+      "background": "door-adventure-background.png"
+    },
+    "mini": {
+      "label": "door-mini-label.png",
+      "emblem": "door-mini-emblem.png",
+      "background": "door-mini-background.png"
+    },
+    "garden": {
+      "label": "door-garden-label.png",
+      "emblem": "door-garden-emblem.png",
+      "background": "door-garden-background.png"
+    }
+  },
+  "icons": {
+    "map": "icon-map.png",
+    "game": "icon-game.png",
+    "flower": "icon-flower.png",
+    "seed": "icon-seed.png",
+    "tree": "icon-tree.png",
+    "water": "icon-water.png",
+    "temple": "icon-temple.png",
+    "star": "icon-star.png",
+    "lock": "icon-lock.png",
+    "check": "icon-check.png",
+    "arrow": "icon-arrow.png",
+    "back": "icon-back.png",
+    "settings": "icon-settings.png",
+    "refresh": "icon-refresh.png",
+    "light": "icon-light.png",
+    "book": "icon-book.png",
+    "sound": "icon-sound.png",
+    "music": "icon-music.png",
+    "musicOff": "icon-musicOff.png",
+    "power": "icon-power.png",
+    "diamond": "icon-diamond.png",
+    "shop": "icon-shop.png",
+    "trophy": "icon-trophy.png",
+    "leaf": "icon-leaf.png",
+    "flag": "icon-flag.png",
+    "help": "icon-help.png"
+  },
+  "darkIcons": {
+    "map": "icon-map-dark.png",
+    "game": "icon-game-dark.png",
+    "flower": "icon-flower-dark.png",
+    "seed": "icon-seed-dark.png",
+    "tree": "icon-tree-dark.png",
+    "water": "icon-water-dark.png",
+    "temple": "icon-temple-dark.png",
+    "star": "icon-star-dark.png",
+    "lock": "icon-lock-dark.png",
+    "check": "icon-check-dark.png",
+    "arrow": "icon-arrow-dark.png",
+    "back": "icon-back-dark.png",
+    "settings": "icon-settings-dark.png",
+    "refresh": "icon-refresh-dark.png",
+    "light": "icon-light-dark.png",
+    "book": "icon-book-dark.png",
+    "sound": "icon-sound-dark.png",
+    "music": "icon-music-dark.png",
+    "musicOff": "icon-musicOff-dark.png",
+    "power": "icon-power-dark.png",
+    "diamond": "icon-diamond-dark.png",
+    "shop": "icon-shop-dark.png",
+    "trophy": "icon-trophy-dark.png",
+    "leaf": "icon-leaf-dark.png",
+    "flag": "icon-flag-dark.png",
+    "help": "icon-help-dark.png"
+  },
+  "scenes": {
+    "n": "scene-n.png",
+    "l": "scene-l.png",
+    "a": "scene-a.png",
+    "t": "scene-t.png"
+  },
+  "wands": [
+    "wand-1.png",
+    "wand-2.png",
+    "wand-3.png",
+    "wand-4.png",
+    "wand-5.png",
+    "wand-6.png",
+    "wand-7.png",
+    "wand-8.png"
+  ],
+  "boss": "boss-emblem.png"
+}

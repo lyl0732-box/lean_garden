@@ -49,7 +49,10 @@ test('real Lean: introductions, strict proofs through induction, at, undo, persi
     for(const level of campaign.filter(l=>l.chapter==='n'&&l.number>=3&&l.number<=11)){
       if((await req('economy')).data.economy.energy<5)assert.equal((await req('energy/refill',{})).status,200);
       const {id}=level;b=(await req('level/start',{level:id})).data;await learn(b);
-      if(['n03','n04','n05'].includes(id))assert.equal((await step(b,'rfl')).status,409,`${id}: rfl cannot skip definition`);
+      if(['n03','n04','n05'].includes(id)){
+        const rejected=await step(b,'rfl');assert.equal(rejected.status,200);assert.equal(rejected.data.rejected,true,`${id}: rfl cannot skip definition`);
+        b.attempt=rejected.data.attempt;
+      }
       for(const code of level.solution){
         if(code.startsWith('garden_strict_rw')){const m=/^garden_strict_rw \[(← )?(.+)\]$/.exec(code);b=await rewrite(b,m[2],m[1]?'backward':'forward');assert.equal(b.complete,false);}
         else if(code.startsWith('induction')){const r=await req('level/step',{level:id,revision:b.attempt.revision,induction:{variable:code.split(' ')[1]}});assert.equal(r.status,200);b=r.data;assert.equal(b.goals.length,2);const bad=(await step(b,'rfl')).data;assert.equal(bad.rejected,true);b.attempt=bad.attempt;}

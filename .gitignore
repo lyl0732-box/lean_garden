@@ -43,3 +43,4 @@ __pycache__/
 *.pyc
 .DS_Store
 Thumbs.db
+clients/taptap-android/license.json

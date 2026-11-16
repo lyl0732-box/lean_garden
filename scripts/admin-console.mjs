@@ -9,7 +9,7 @@ export class SshManagement{
     if(this.child)return;const c=this.config;
     if(!/^[a-zA-Z0-9.-]+$/.test(c.host)||!/^[a-zA-Z0-9_-]+$/.test(c.user)||c.root!=='/home/ubuntu/lean-garden')throw Error('Invalid SSH target');
     const args=['-T','-i',path.resolve(root,c.key),'-o','BatchMode=yes','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+path.resolve(root,c.knownHosts),'-o','ConnectTimeout=10','-o','ServerAliveInterval=10','-o','ServerAliveCountMax=2',c.user+'@'+c.host,c.root+'/tools/node/bin/node '+c.root+'/current/server/admin-rpc.mjs'];
-    const child=spawn('ssh',args,{windowsHide:true,stdio:['pipe','pipe','pipe']});this.child=child;this.lastError='';
+    const child=spawn('ssh',args,{cwd:root,windowsHide:true,stdio:['pipe','pipe','pipe']});this.child=child;this.lastError='';
     readline.createInterface({input:child.stdout}).on('line',line=>{try{const reply=JSON.parse(line),pending=this.pending.get(reply.id);if(pending){clearTimeout(pending.timer);this.pending.delete(reply.id);pending.resolve(reply);}}catch{}});
     child.stderr.on('data',data=>{this.lastError=(this.lastError+data.toString()).slice(-1500);});
     const failed=error=>{if(this.child!==child)return;this.child=null;for(const p of this.pending.values()){clearTimeout(p.timer);p.reject(Error('SSH 管理连接中断。'+(error?.message||this.lastError)));}this.pending.clear();};
@@ -28,7 +28,7 @@ export function createConsole({bridge,key,uiRoot=path.join(root,'admin-console')
     try{
       if(req.headers.host!=='127.0.0.1:'+server.address().port)throw Object.assign(Error('请使用本机地址访问。'),{status:403});
       const url=new URL(req.url,'http://localhost');
-      if(url.pathname==='/health'&&req.method==='GET')return send(res,200,{app:'lean-garden-admin',pid:process.pid});
+      if(url.pathname==='/health'&&req.method==='GET')return send(res,200,{app:'lean-garden-admin',pid:process.pid,projectRoot:root});
       if(url.pathname.startsWith('/api/')){
         if(req.headers.origin&&req.headers.origin!=='http://'+req.headers.host||req.headers['sec-fetch-site']==='cross-site')throw Object.assign(Error('跨站请求已拒绝。'),{status:403});
         const provided=Buffer.from(req.headers['x-admin-key']||''),expected=Buffer.from(key);if(provided.length!==expected.length||!timingSafeEqual(provided,expected))throw Object.assign(Error('管理凭据失效，请通过启动脚本重新打开面板。'),{status:401});
@@ -46,7 +46,7 @@ if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.ur
   const config=JSON.parse(await readFile(path.join(root,'deploy/linux-target.json'),'utf8')),key=randomBytes(32).toString('hex'),bridge=new SshManagement(config),port=Number(process.env.GARDEN_ADMIN_PORT||3218),server=createConsole({bridge,key});
   await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(port,'127.0.0.1',resolve);});
   const privateDir=path.join(root,'deploy/.private');await mkdir(privateDir,{recursive:true});
-  await writeFile(path.join(privateDir,'admin-console-runtime.json'),JSON.stringify({pid:process.pid,url:'http://127.0.0.1:'+server.address().port+'/#key='+key,started:new Date().toISOString()}),{mode:0o600});
+  await writeFile(path.join(privateDir,'admin-console-runtime.json'),JSON.stringify({pid:process.pid,projectRoot:root,url:'http://127.0.0.1:'+server.address().port+'/#key='+key,started:new Date().toISOString()}),{mode:0o600});
   console.log('Local management console listening on 127.0.0.1:'+server.address().port+' (SSH: '+config.host+').');
   const stop=()=>{bridge.close();server.close(()=>process.exit());setTimeout(()=>process.exit(),1000).unref();};process.on('SIGINT',stop);process.on('SIGTERM',stop);
 }

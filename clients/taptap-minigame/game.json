@@ -1,0 +1,5 @@
+{
+  "deviceOrientation": "portrait",
+  "showStatusBar": false,
+  "networkTimeout": {"request": 120000, "downloadFile": 60000}
+}

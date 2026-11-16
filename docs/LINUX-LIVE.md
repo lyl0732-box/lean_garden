@@ -28,7 +28,9 @@ Lean 运行依赖约 4.4 GiB；初次编译模块压缩包约 1.20 GiB，只传�
 
 ## 服务与证书
 
-游戏通过 `lean-garden.service` 开机启动，仅监听本机 3210，由 Nginx 对外提供 HTTPS。小内存服务器将 Lean 验证并发设为 1，已测第一关约 2.2 秒；复杂题按实际验证耗时等待。其它网站的命名虚拟主机保留。
+游戏通过 `lean-garden.service` 开机启动，仅监听 `127.0.0.1:3211`，由 Nginx 对外提供 HTTPS。2026-11-16 已将云端 3210 迁至 3211，3210 可另作他用；公网地址和各客户端的服务器地址不变。本机开发服务仍使用 3210。小内存服务器将 Lean 验证并发设为 1，复杂题按实际验证耗时等待。其它网站的命名虚拟主机保留。
+
+云端端口记在 `deploy/linux-target.json` 的 `port`，增量部署会用它进行真实 Lean 健康检查。systemd 通过 `/etc/systemd/system/lean-garden.service.d/20-port.conf` 持久设置端口，Nginx 的游戏配置位于 `/etc/nginx/sites-available/lean-garden`。迁移脚本 `deploy/move-linux-port.py` 会先检查目标端口、备份配置和数据，修改后验证内部与公网健康状态，失败则恢复原配置。迁移备份独立存放于云端 `config-backups/`，不会被普通代码版本清理。
 
 公网 IP 使用 Let's Encrypt 的 IP 证书，`lean-garden-cert-renew.timer` 每天检查两次并在更新后重新加载 Nginx。IP 证书有效期较短，需要保留这个定时任务。[官方 IP 证书说明](https://letsencrypt.org/2026/03/11/shorter-certs-certbot)。
 

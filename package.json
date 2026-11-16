@@ -1,6 +1,6 @@
 {
   "name": "lean-garden",
-  "version": "0.13.1",
+  "version": "0.13.3",
   "private": true,
   "type": "module",
   "description": "Button-driven Lean proof adventure, verified locally by Lean 4",
@@ -14,6 +14,8 @@
     "build:manifest": "node scripts/build-media.mjs --manifest-only",
     "build:windows": "node scripts/build-windows.mjs",
     "build:android": "node scripts/build-android.mjs",
+    "build:taptap:android": "node scripts/build-taptap-android.mjs",
+    "build:taptap:minigame": "node scripts/build-taptap-minigame.mjs",
     "build:deploy": "node scripts/package-deploy.mjs"
   },
   "engines": {
