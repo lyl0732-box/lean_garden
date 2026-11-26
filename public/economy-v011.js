@@ -2,8 +2,13 @@ import {resourceCount} from './shop.js';
 import {icon} from './ui.js';
 export {evolution,evolvedMascot,growthView} from './yaya-forms.js';
 export {shopView} from './shop.js';
-export function energyPill(e){return e?`<button class="energy-pill" data-action="energy" aria-label="活跃度 ${e.energy} / 50"><span>⚡</span><b data-energy-value>${e.energy}</b><small>/50</small></button>`:'';}
+export function energyPill(e){
+  if(!e)return '';
+  const label=e.unlimited?'无限':`${e.energy} / ${e.maxEnergy}`;
+  return `<button class="energy-pill" data-action="energy" aria-label="活跃度 ${label}"><span>⚡</span><b data-energy-value>${resourceCount(e,'energy')}</b>${e.unlimited?'':`<small>/${e.maxEnergy}</small>`}</button>`;
+}
 export function energyView(e,btn){
+  if(e.unlimited)return `<div class="energy-orb">⚡<b>∞</b></div><h2>活跃度无限</h2><p>随时进入关卡，也可以反复练习。</p>${btn('close-modal','继续冒险','primary wide')}`;
   const seconds=Math.ceil(e.nextIn/1000);
   const time=`${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`;
   return `<div class="energy-orb">⚡<b>${e.energy}<small>/50</small></b></div>

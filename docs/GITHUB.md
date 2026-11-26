@@ -38,6 +38,6 @@ Android 工程固定 compileSdk／targetSdk 36、buildTools 36.0.0、Gradle 8.11
 
 按用户要求，每次修正完成并通过相关验证后，都提交并推送到本仓库；项目协作规则记在根目录 [AGENTS.md](../AGENTS.md)。
 
-默认构建 Windows、直发 Android 和网页版的无广告、无现金内购版本。TapTap APK 与小游戏使用单独的构建命令和下载目录，按用户的发布要求更新。[TapTap 两种包体](TAPTAP.md)
+默认构建 Windows、直发 Android 和网页版的无广告、无现金内购版本，所有玩家可直接使用无限补给。游戏请求用 `X-Garden-Edition: ad-free` 选择无限资源规则并沿用账号鉴权。TapTap APK 与小游戏使用单独的构建命令和下载目录，按用户的发布要求更新。[TapTap 两种包体](TAPTAP.md)
 
 先运行相应验证，`git add` 后执行 `node scripts/check-git-export.mjs` 检查暂存区，再提交和推送。这个检查不会连接服务器或修改账号。上传 GitHub 不等于发布游戏；根目录的云端推送脚本另行部署代码，并排除数据库和私钥。

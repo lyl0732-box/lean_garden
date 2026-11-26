@@ -1,4 +1,4 @@
-export const GAME_VERSION='0.13.4';
+export const GAME_VERSION='0.13.5';
 export async function checkWebUpdate(status){
   if(/Android/i.test(navigator.userAgent)&&/LeanGardenAndroid\/1/.test(navigator.userAgent)){
     const native=/LeanGarden\/(\d+)\.(\d+)\./.exec(navigator.userAgent);

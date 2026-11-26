@@ -24,8 +24,8 @@ const publicDir=path.join(root,'public');
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.json':'application/json','.ico':'image/x-icon','.mp3':'audio/mpeg','.apk':'application/vnd.android.package-archive'};
 const fail=(status,message)=>Object.assign(new Error(message),{status});
 const pendingTopics=profile=>profile.isPractice?[]:[...new Set(campaign.filter(l=>profile.completed[l.id]).flatMap(l=>l.discoveries||[]))].filter(id=>!(profile.topicsLearned||[]).includes(id));
-const summary=profile=>({completed:profile.completed,unlocked:[...unlocked(profile)],collectionUnlocked:profile.collectionUnlocked,freePlay:!!profile.isPractice,prologueSeen:!!profile.prologueSeen,tutorials:profile.tutorials||[],guidedTutorials:profile.guidedTutorials||[],introduced:profile.introduced,lastLevel:profile.lastLevel,visited:profile.visited,economy:economySummary(profile),stars:Object.values(profile.completed).reduce((s,r)=>s+r.stars,0)});
-function bootstrap(profile,account=null,owner=profile) {return {chapters,cards,levels:levels.map(l=>publicLevel(l,profile)),progress:summary(profile),account:account?publicAccount(account):null,shop:shopInfo(),garden:quizSummary(owner),pendingCards:introductions(profile),pendingTopics:pendingTopics(profile)};}
+const summary=(profile,economy)=>({completed:profile.completed,unlocked:[...unlocked(profile)],collectionUnlocked:profile.collectionUnlocked,freePlay:!!profile.isPractice,prologueSeen:!!profile.prologueSeen,tutorials:profile.tutorials||[],guidedTutorials:profile.guidedTutorials||[],introduced:profile.introduced,lastLevel:profile.lastLevel,visited:profile.visited,economy,stars:Object.values(profile.completed).reduce((s,r)=>s+r.stars,0)});
+function bootstrap(profile,account,owner,economy,shop) {return {chapters,cards,levels:levels.map(l=>publicLevel(l,profile)),progress:summary(profile,economy),account:account?publicAccount(account):null,shop,garden:quizSummary(owner),pendingCards:introductions(profile),pendingTopics:pendingTopics(profile)};}
 function attemptFor(profile,id) {return profile.attempts[id]||{steps:[],hints:0,mistakes:0,revision:0};}
 function codesFor(level,steps) {
   const all=[...level.actions];
@@ -34,14 +34,14 @@ function codesFor(level,steps) {
   all.push(...actionsFor(fake,level));
   return steps.map(id=>{if(typeof id==='object'&&typeof id.code==='string')return id.code;const action=all.find(a=>a.id===id);if(!action&&level.id==='n13'&&id==='n13-1')return 'garden_strict_rw [Nat.add_comm b c]';if(!action)throw fail(400,'存档包含未知卡牌。');return action.code;});
 }
-function statePayload(level,profile,attempt,result) {
+function statePayload(level,profile,attempt,result,economy) {
   const proof=codesFor(level,attempt.steps),repo=repository(profile,level,result.goals);
   const actions=actionsFor(profile,level).filter(a=>a.skill!=='use').map(a=>({...a,effectTarget:actionTarget(a,result.goals)}));
   if(unlocked(profile).has('use'))actions.push({id:'use-manual',skill:'use',label:'亲手构造见证',effectTarget:'goal'});
   for(const skill of ['rw','apply','induction'])if(unlocked(profile).has(skill)&&!actions.some(a=>a.skill===skill))actions.push({id:`${skill}-selector`,skill,label:'选择使用对象'});
   // Lean's strict rfl checks the current written equality, independently of
   // the reference route. Keep the legacy field empty for older clients.
-  return {level:publicLevel(level,profile),attempt,proof,goals:result.goals,complete:result.complete,elapsed:result.elapsed,actions,repository:repo,applyRepository:repository(profile,level,result.goals,'apply'),introductions:introductions(profile),pendingTopics:pendingTopics(profile),requiredRewrites:[],progress:summary(profile)};
+  return {level:publicLevel(level,profile),attempt,proof,goals:result.goals,complete:result.complete,elapsed:result.elapsed,actions,repository:repo,applyRepository:repository(profile,level,result.goals,'apply'),introductions:introductions(profile),pendingTopics:pendingTopics(profile),requiredRewrites:[],progress:summary(profile,economy)};
 }
 async function readBody(req) {
   let size=0; const chunks=[];
@@ -65,6 +65,8 @@ export async function createServer({allowGuestForTests=false,publicRoot,manageme
       const url=new URL(req.url,'http://localhost');
       if(url.pathname==='/api/health') return send(res,200,await engineHealth());
       if(url.pathname.startsWith('/api/')) {
+        // Published TapTap packages continue using the original finite wallet.
+        const adFree=req.headers['x-garden-edition']==='ad-free';
         const origin=req.headers.origin;
         if(origin&&new URL(origin).host!==req.headers.host) throw fail(403,'请从游戏本身发起操作。');
         if(req.headers['sec-fetch-site']==='cross-site')throw fail(403,'请从游戏本身发起操作。');
@@ -74,7 +76,7 @@ export async function createServer({allowGuestForTests=false,publicRoot,manageme
           if(req.method!=='POST')throw fail(404,'没有这个账号接口。');const body=await readBody(req),peer=req.socket.remoteAddress||'local',now=Date.now();
           const rate=authRates.get(peer);if(rate?.until>now&&rate.count>=100)throw fail(429,'请求较多，请稍后再试。');authRates.set(peer,{count:rate?.until>now?rate.count+1:1,until:rate?.until>now?rate.until:now+600000});
           if(url.pathname==='/api/auth/logout'){
-            if(account){const owner=accountProfile(account);await exclusive(owner,async()=>{changeFreeplay(owner,false);await save();});}
+            if(account){const owner=accountProfile(account);await exclusive(owner,async()=>{changeFreeplay(owner,false,Date.now(),adFree);await save();});}
             await logout(req.headers.cookie);const cookies=['garden_session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0'];if(body.forgetRemembered){await rememberAccount(account,req.headers.cookie,false);cookies.push(rememberCookie(null));}res.setHeader('Set-Cookie',cookies);return send(res,200,{ok:true});
           }
           if(url.pathname==='/api/auth/hint')return send(res,200,{hint:passwordHint(body.username)});
@@ -91,15 +93,18 @@ export async function createServer({allowGuestForTests=false,publicRoot,manageme
         let owner;
         if(account)owner=accountProfile(account);
         else{const guest=getProfile(req.headers.cookie);owner=guest.profile;if(guest.fresh){res.setHeader('Set-Cookie',`garden_profile=${owner.id}; Path=/; HttpOnly; SameSite=Strict; Max-Age=31536000`);await save();}}
+        const economy=()=>economySummary(owner,Date.now(),adFree);
+        const shop=shopInfo(adFree);
+        const bootstrapFor=profile=>bootstrap(profile,account,owner,economy(),shop);
         attachBenefits(owner,account);
-        await exclusive(owner,async()=>{if(expireFreeplay(owner))await save();});
-        const profile=activeProfile(owner);if(refreshQuizzes(owner))await save();
-        if(req.method==='GET'&&url.pathname==='/api/bootstrap') return send(res,200,bootstrap(profile,account,owner));
-        if(req.method==='GET'&&url.pathname==='/api/economy')return send(res,200,{economy:economySummary(owner),shop:shopInfo(),garden:quizSummary(owner)});
+        if(!adFree)await exclusive(owner,async()=>{if(expireFreeplay(owner))await save();});
+        const profile=activeProfile(owner,adFree);if(refreshQuizzes(owner))await save();
+        if(req.method==='GET'&&url.pathname==='/api/bootstrap') return send(res,200,bootstrapFor(profile));
+        if(req.method==='GET'&&url.pathname==='/api/economy')return send(res,200,{economy:economy(),shop,garden:quizSummary(owner)});
         if(req.method==='GET'&&url.pathname==='/api/garden/quiz')return send(res,200,{question:quizFor(owner,url.searchParams.get('id'))});
         if(req.method==='GET'&&url.pathname==='/api/save/export') {
           res.setHeader('Content-Disposition','attachment; filename="lean-garden-save.json"');
-          return send(res,200,{version:9,exported:new Date().toISOString(),account:account?publicAccount(account):null,...summary(owner),economy:exportEconomy(owner),legacyChallengesV6:owner.legacyChallengesV6,legacyLevelsV8:owner.legacyLevelsV8,topicsLearned:owner.topicsLearned,attempts:owner.attempts,practice:owner.practice,freePlay:!!owner.freePlay,legacyAttempts:owner.legacyAttempts,legacyAttemptsV2:owner.legacyAttemptsV2,legacyAttemptsV3:owner.legacyAttemptsV3});
+          return send(res,200,{version:9,exported:new Date().toISOString(),account:account?publicAccount(account):null,...summary(owner,exportEconomy(owner)),legacyChallengesV6:owner.legacyChallengesV6,legacyLevelsV8:owner.legacyLevelsV8,topicsLearned:owner.topicsLearned,attempts:owner.attempts,practice:owner.practice,freePlay:!!owner.freePlay,legacyAttempts:owner.legacyAttempts,legacyAttemptsV2:owner.legacyAttemptsV2,legacyAttemptsV3:owner.legacyAttemptsV3});
         }
         if(req.method==='GET'&&url.pathname==='/api/proof/export') {
           const level=byId.get(url.searchParams.get('level'));
@@ -112,17 +117,17 @@ export async function createServer({allowGuestForTests=false,publicRoot,manageme
         const body=await readBody(req);
         return await exclusive(owner,async()=>{
           attachBenefits(owner,account);
-          if(expireFreeplay(owner))await save();
-          const profile=activeProfile(owner);
-          if(url.pathname==='/api/checkin/claim'){const result=claimCheckin(owner);await save();return send(res,200,{...result,economy:economySummary(owner)});}
-          if(url.pathname==='/api/shop/claim-beta'){claimBeta(owner);await save();return send(res,200,{economy:economySummary(owner)});}
-          if(url.pathname==='/api/shop/claim-trial'){claimTrial(owner);await save();return send(res,200,{economy:economySummary(owner)});}
+          if(!adFree&&expireFreeplay(owner))await save();
+          const profile=activeProfile(owner,adFree);
+          if(url.pathname==='/api/checkin/claim'){const result=claimCheckin(owner);await save();return send(res,200,{...result,economy:economy()});}
+          if(url.pathname==='/api/shop/claim-beta'){if(!adFree){claimBeta(owner);await save();}return send(res,200,{economy:economy()});}
+          if(url.pathname==='/api/shop/claim-trial'){if(!adFree){claimTrial(owner);await save();}return send(res,200,{economy:economy()});}
           // Published TapTap clients use the original route for diamond exchanges.
           if(['/api/shop/redeem','/api/shop/purchase'].includes(url.pathname)){
-            const receipt=buyWithDiamonds(owner,body);await save();return send(res,200,{...receipt,economy:economySummary(owner)});
+            const receipt=buyWithDiamonds(owner,body,adFree);if(!adFree)await save();return send(res,200,{...receipt,economy:economy()});
           }
-          if(url.pathname==='/api/garden/answer'){const result=answerQuiz(owner,body.id,body.choice);await save();return send(res,200,{result,economy:economySummary(owner),garden:quizSummary(owner)});}
-          if(url.pathname==='/api/energy/refill'){refillEnergy(owner);await save();return send(res,200,{economy:economySummary(owner)});}
+          if(url.pathname==='/api/garden/answer'){const result=answerQuiz(owner,body.id,body.choice);await save();return send(res,200,{result,economy:economy(),garden:quizSummary(owner)});}
+          if(url.pathname==='/api/energy/refill'){if(!adFree){refillEnergy(owner);await save();}return send(res,200,{economy:economy()});}
           if(url.pathname==='/api/onboarding/seen'){
             owner.prologueSeen=true;await save();return send(res,200,{ok:true});
           }
@@ -135,15 +140,15 @@ export async function createServer({allowGuestForTests=false,publicRoot,manageme
           if(body.level&&body.practice!==undefined&&body.practice!==!!profile.isPractice)throw fail(409,'选关模式已在其他页面切换，请重新进入关卡。');
           if(url.pathname==='/api/progress/freeplay'){
             if(typeof body.enabled!=='boolean')throw fail(400,'请选择开启或关闭自由选关。');
-            changeFreeplay(owner,body.enabled);const active=activeProfile(owner);await save();return send(res,200,bootstrap(active,account,owner));
+            changeFreeplay(owner,body.enabled,Date.now(),adFree);const active=activeProfile(owner,adFree);await save();return send(res,200,bootstrapFor(active));
           }
           if(url.pathname==='/api/progress/reset') {
             if(body.confirm!=='RESET')throw fail(400,'需要在设置中确认重置。');
-            changeFreeplay(owner,false);owner.economy.garden.questions=[];owner.visited=[];owner.completed={};owner.attempts={};owner.introduced=['rfl'];owner.topicsLearned=[];owner.rulesVersion=4;owner.challengeVersion=7;owner.curriculumVersion=9;owner.prologueSeen=false;owner.tutorials=[];owner.guidedTutorials=[];delete owner.legacyChallengesV6;delete owner.legacyLevelsV8;delete owner.legacyAttempts;delete owner.legacyAttemptsV2;delete owner.legacyAttemptsV3;delete owner.legacyUnlocked;delete owner.practice;owner.freePlay=false;owner.lastLevel='n01';await save();return send(res,200,bootstrap(owner,account,owner));
+            changeFreeplay(owner,false);delete owner.adFreePlay;owner.economy.garden.questions=[];owner.visited=[];owner.completed={};owner.attempts={};owner.introduced=['rfl'];owner.topicsLearned=[];owner.rulesVersion=4;owner.challengeVersion=7;owner.curriculumVersion=9;owner.prologueSeen=false;owner.tutorials=[];owner.guidedTutorials=[];delete owner.legacyChallengesV6;delete owner.legacyLevelsV8;delete owner.legacyAttempts;delete owner.legacyAttemptsV2;delete owner.legacyAttemptsV3;delete owner.legacyUnlocked;delete owner.practice;owner.freePlay=false;owner.lastLevel='n01';await save();return send(res,200,bootstrapFor(owner));
           }
           if(url.pathname==='/api/cards/learn'){
             if(!introductions(profile).includes(body.card))throw fail(400,'这张卡当前不需要领取。');
-            profile.introduced.push(body.card);await save();return send(res,200,{pendingCards:introductions(profile),progress:summary(profile)});
+            profile.introduced.push(body.card);await save();return send(res,200,{pendingCards:introductions(profile),progress:summary(profile,economy())});
           }
           if(url.pathname==='/api/topics/learn'){
             if(!pendingTopics(profile).includes(body.topic))throw fail(400,'这个主题还没有解锁。');
@@ -152,7 +157,7 @@ export async function createServer({allowGuestForTests=false,publicRoot,manageme
           const level=byId.get(body.level);
           if(!level)throw fail(404,'找不到这个关卡。');
           if(!canEnter(profile,level))throw fail(403,'这个关卡还没有解锁。先完成前面的冒险，收集所需技能。');
-          if(profile.isPractice){const old=profile.attempts[level.id],continuing=profile.lastLevel===level.id&&!!old?.run&&!old.rewarded;requireFreeplayTime(owner,continuing);profile.lastLevel=level.id;}
+          if(profile.isPractice){if(!adFree)requireFreeplayTime(owner);profile.lastLevel=level.id;}
           const attempt=structuredClone(attemptFor(profile,level.id));
           if(url.pathname==='/api/level/start') {
             let result=await checkLean(level,codesFor(level,attempt.steps));engineFailure(result);
@@ -162,10 +167,10 @@ export async function createServer({allowGuestForTests=false,publicRoot,manageme
               attempt.revision++;
             }
             if(!result.ok)throw fail(409,'关卡数据已变化，请重新开始本关。');
-            if(!result.complete)beginRun(owner,attempt);
+            if(!result.complete)beginRun(owner,attempt,Date.now(),adFree);
             if(!profile.visited.includes(level.id))profile.visited.push(level.id);
             profile.lastLevel=level.id;profile.attempts[level.id]=attempt;await save();
-            return send(res,200,statePayload(level,profile,attempt,result));
+            return send(res,200,statePayload(level,profile,attempt,result,economy()));
           }
           if(!profile.visited.includes(level.id))throw fail(409,'请先进入关卡。');
           if(body.revision!==attempt.revision)throw fail(409,'另一个页面更新了本关，请重新进入以同步进度。');
@@ -180,25 +185,25 @@ export async function createServer({allowGuestForTests=false,publicRoot,manageme
           if(url.pathname==='/api/level/learn') {
             if(!introductions(profile).includes(body.card))throw fail(400,'这张卡当前不需要介绍。');
             profile.introduced.push(body.card);await save();
-            return send(res,200,{introductions:introductions(profile),progress:summary(profile)});
+            return send(res,200,{introductions:introductions(profile),progress:summary(profile,economy())});
           }
           if(url.pathname==='/api/level/hint') {
             const codes=codesFor(level,attempt.steps);
             const current=await checkLean(level,codes);engineFailure(current);
             if(current.complete)throw fail(409,'本关已完成，不需要消耗提示。');
-            useHint(owner);
+            useHint(owner,adFree);
             attempt.hints++;attempt.revision++;profile.attempts[level.id]=attempt;await save();
-            return send(res,200,{...nextHint(profile,level,codes,current.goals,attempt.hints),attempt,economy:economySummary(owner)});
+            return send(res,200,{...nextHint(profile,level,codes,current.goals,attempt.hints),attempt,economy:economy()});
           }
           if(url.pathname==='/api/level/answer'){
             const current=await checkLean(level,codesFor(level,attempt.steps));engineFailure(current);
             if(current.complete)throw fail(409,'本关已完成，可以直接查看自己的证明。');
-            const consumed=useAnswer(owner,attempt);if(consumed)attempt.revision++;
+            const unlockedAnswer=useAnswer(owner,attempt,adFree);if(unlockedAnswer)attempt.revision++;
             profile.attempts[level.id]=attempt;await save();
-            return send(res,200,{solution:level.solution,attempt,economy:economySummary(owner)});
+            return send(res,200,{solution:level.solution,attempt,economy:economy()});
           }
           if(url.pathname==='/api/level/reset') {
-            if(profile.isPractice&&attempt.rewarded)requireFreeplayTime(owner,false);
+            if(!adFree&&profile.isPractice&&attempt.rewarded)requireFreeplayTime(owner,false);
             attempt.steps=[];attempt.mistakes=0;
             if(attempt.rewarded||!attempt.run)delete attempt.answerUnlocked;
             attempt.hints=attempt.answerUnlocked?1:0;
@@ -235,8 +240,8 @@ export async function createServer({allowGuestForTests=false,publicRoot,manageme
           }
           const wasComplete=!!profile.completed[level.id];
           const oldUnlocked=unlocked(profile);
-          if(url.pathname==='/api/level/reset'&&(attempt.rewarded||!attempt.run)){delete attempt.run;beginRun(owner,attempt);}
-          if(url.pathname==='/api/level/undo'&&!attempt.run)beginRun(owner,attempt);
+          if(url.pathname==='/api/level/reset'&&(attempt.rewarded||!attempt.run)){delete attempt.run;beginRun(owner,attempt,Date.now(),adFree);}
+          if(url.pathname==='/api/level/undo'&&!attempt.run)beginRun(owner,attempt,Date.now(),adFree);
           const experience=result.complete?awardRun(owner,attempt,level):null;
           if(result.complete) {
             const stars=attempt.hints?1:attempt.mistakes||attempt.steps.length>level.par?2:3;
@@ -244,7 +249,7 @@ export async function createServer({allowGuestForTests=false,publicRoot,manageme
             if(!old||stars>old.stars||(stars===old.stars&&attempt.steps.length<old.steps.length)||old.proofVersion!==4)profile.completed[level.id]={stars:Math.max(stars,old?.stars||0),steps:attempt.steps,proof:codesFor(level,attempt.steps),statement:level.statement,proofVersion:4,at:new Date().toISOString()};
           }
           profile.attempts[level.id]=attempt;await save();
-          return send(res,200,{...statePayload(level,profile,attempt,result),experience,firstClear:result.complete&&!wasComplete,newCards:[...unlocked(profile)].filter(x=>!oldUnlocked.has(x))});
+          return send(res,200,{...statePayload(level,profile,attempt,result,economy()),experience,firstClear:result.complete&&!wasComplete,newCards:[...unlocked(profile)].filter(x=>!oldUnlocked.has(x))});
         });
       }
       if(req.method!=='GET'&&req.method!=='HEAD')throw fail(405,'不支持此请求。');

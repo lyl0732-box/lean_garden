@@ -24,6 +24,7 @@ import {authorLinks,checkinView,checkinRewardLabel,rewriteEditorSource} from './
 import {checkWebUpdate,GAME_VERSION} from './update-check.js';
 
 
+const GAME_EDITION='ad-free';
 const $=selector=>document.querySelector(selector);
 const app=$('#app'),overlay=$('#overlay');
 const state={page:'home',chapter:'n',data:null,battle:null,busy:false,health:null,filter:'all',knownOnly:false,sound:localStorage.getItem('garden-sound')!=='off',motion:localStorage.getItem('garden-motion')!=='off',error:null};
@@ -45,7 +46,10 @@ const stars=(n=0)=>`<span class="stars" aria-label="${n} 颗星">${[1,2,3].map(i
 
 async function api(path,body,options={}) {
   if(body?.level)body={...body,practice:!!state.data?.progress.freePlay};
-  const response=await fetch('/api/'+path,{method:body?'POST':'GET',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined,...options});
+  const headers=new Headers(options.headers);
+  headers.set('X-Garden-Edition',GAME_EDITION);
+  if(body)headers.set('Content-Type','application/json');
+  const response=await fetch('/api/'+path,{method:body?'POST':'GET',body:body?JSON.stringify(body):undefined,...options,headers});
   const data=await response.json();
   if(!response.ok){if(data.code==='AUTH_REQUIRED')location.reload();throw Object.assign(new Error(data.error||'本机服务暂时没有响应。'),{status:response.status,code:data.code});}
   if(data.garden&&state.data)state.data.garden=data.garden;
@@ -55,11 +59,11 @@ async function api(path,body,options={}) {
 }
 function syncEconomy(e){if(state.data)state.data.progress.economy=e;if(state.battle)state.battle.progress.economy=e;state.economyReceivedAt=Date.now();}
 function currentEconomy(){
-  const e=state.data?.progress.economy;if(!e)return null;
+  const e=state.data?.progress.economy;if(!e||e.unlimited)return e||null;
   const elapsed=Math.max(0,Date.now()-(state.economyReceivedAt||Date.now()));
   const recovered=e.energy===50?0:Math.max(0,1+Math.floor((elapsed-e.nextIn)/e.interval));
   const energy=Math.min(50,e.energy+recovered);
-  return {...e,energy,nextIn:energy===50?0:Math.max(0,e.nextIn+recovered*e.interval-elapsed),freeplayRemainingMs:e.unlimited?Number.MAX_SAFE_INTEGER:Math.max(0,e.freeplayRemainingMs-(e.freeplayActive?elapsed:0))};
+  return {...e,energy,nextIn:energy===50?0:Math.max(0,e.nextIn+recovered*e.interval-elapsed),freeplayRemainingMs:Math.max(0,e.freeplayRemainingMs-(e.freeplayActive?elapsed:0))};
 }
 function showCheckin(){modal(checkinView(currentEconomy().checkin,btn),'checkin-modal');}
 async function collectCheckin(){if(walletBusy)return;walletBusy=true;try{const r=await api('checkin/claim',{});render();showCheckin();if(!r.duplicate){rewardSound(state.sound);toast('签到成功：'+checkinRewardLabel(r.reward));}}catch(e){toast(e.message);}finally{walletBusy=false;}}
@@ -92,18 +96,23 @@ async function submitQuiz(id){
   if(walletBusy)return;const selected=overlay.querySelector('[data-quiz-choice]:checked');if(!selected)return;walletBusy=true;
   try{const r=await api('garden/answer',{id,choice:Number(selected.value)});render();modal(resultView(r.result,btn),'quiz-modal');}catch(error){toast(error.message);}finally{walletBusy=false;}
 }
-function confirmExit(logoutOnly=false){modal('<span class="large-card-icon">'+icon('power')+'</span><h2>'+(logoutOnly?'退出当前账号？':'离开花园休息一会儿？')+'</h2><p>冒险进度和背包已经保存，正在使用的选关计时会暂停。</p>'+btn(logoutOnly?'logout-now':'exit-now',logoutOnly?'退出账号':'保存并退出','primary wide')+btn('close-modal','再陪芽芽一会儿','text-button'),'exit-modal');}
+function confirmExit(logoutOnly=false){modal('<span class="large-card-icon">'+icon('power')+'</span><h2>'+(logoutOnly?'退出当前账号？':'离开花园休息一会儿？')+'</h2><p>'+ (currentEconomy().unlimited?'冒险和练习进度已经保存。':'冒险进度和背包已经保存，正在使用的选关计时会暂停。')+'</p>'+btn(logoutOnly?'logout-now':'exit-now',logoutOnly?'退出账号':'保存并退出','primary wide')+btn('close-modal','再陪芽芽一会儿','text-button'),'exit-modal');}
 async function leaveGame(quit){await api('auth/logout',{});if(globalThis.gardenWindow||/LeanGarden\//.test(navigator.userAgent)){location.href=quit?'leangarden://exit':'leangarden://connection';setTimeout(()=>location.reload(),1500);}else location.reload();}
 async function showAnswer(){
   if(state.busy)return;
-  if(!state.battle.attempt.answerUnlocked){const e=currentEconomy();modal(`<h2>打开本局参考答案？</h2><p>消耗 1 张答案包，可以反复查看本局完整证明。仍需亲手出招，本局最高一颗星。</p><p>当前有 <b>${resourceCount(e,'answers')}</b> 张答案包。</p>${e.answers?btn('answer-now','消耗 1 张 · 查看完整答案','primary wide'):btn('shop','去商城查看答案包','primary wide')}${btn('close-modal','再想一想','text-button')}`,'answer-confirm');return;}
+  if(!state.battle.attempt.answerUnlocked){
+    const e=currentEconomy();
+    const details=e.unlimited?'可随时查看本局的完整参考证明。':'消耗 1 张答案包，可以反复查看本局完整证明。';
+    const open=e.unlimited?btn('answer-now','查看完整答案','primary wide'):e.answers?btn('answer-now','消耗 1 张 · 查看完整答案','primary wide'):btn('shop','去商城查看答案包','primary wide');
+    modal(`<h2>打开本局参考答案？</h2><p>${details}仍需亲手出招，本局最高一颗星。</p>${e.unlimited?'':`<p>当前有 <b>${resourceCount(e,'answers')}</b> 张答案包。</p>`}${open}${btn('close-modal','再想一想','text-button')}`,'answer-confirm');return;
+  }
   return revealAnswer();
 }
 async function revealAnswer(){
   if(state.busy)return;state.busy=true;
-  try{const b=state.battle,r=await api('level/answer',{level:b.level.id,revision:b.attempt.revision});b.attempt=r.attempt;hintSuggestion=null;render();modal(`<span class="eyebrow">REFERENCE PROOF</span><h2>这条花径的一种走法</h2><p class="answer-note">每一步都需要你亲手操作。也欢迎找到另一条正确的证明。</p><ol class="answer-steps">${r.solution.map(code=>`<li><pre class="proof-source">${esc(pretty(code))}</pre></li>`).join('')}</ol><p class="subtle">本局再次查看不再消耗答案包；回到起点也可继续查看。</p>${btn('close-modal','我来完成证明','primary wide')}`,'answer-modal');}catch(error){toast(error.message);}finally{state.busy=false;render();}
+  try{const b=state.battle,r=await api('level/answer',{level:b.level.id,revision:b.attempt.revision});b.attempt=r.attempt;hintSuggestion=null;render();modal(`<span class="eyebrow">REFERENCE PROOF</span><h2>这条花径的一种走法</h2><p class="answer-note">每一步都需要你亲手操作。也欢迎找到另一条正确的证明。</p><ol class="answer-steps">${r.solution.map(code=>`<li><pre class="proof-source">${esc(pretty(code))}</pre></li>`).join('')}</ol>${r.economy.unlimited?'':'<p class="subtle">本局再次查看不再消耗答案包；回到起点也可继续查看。</p>'}${btn('close-modal','我来完成证明','primary wide')}`,'answer-modal');}catch(error){toast(error.message);}finally{state.busy=false;render();}
 }
-setInterval(()=>{void enforceFreeplayExpiry();const e=currentEconomy();if(!e||document.hidden)return;for(const value of document.querySelectorAll('[data-diamond-value]'))value.textContent=resourceCount(e,'diamonds');for(const time of document.querySelectorAll('[data-freeplay-time]'))time.textContent=formatTime(e.freeplayRemainingMs);const gardenClock=document.querySelector('[data-garden-countdown]');if(gardenClock&&state.data.garden)gardenClock.textContent=formatTime(state.data.garden.nextAt-(e.serverTime+Date.now()-(state.economyReceivedAt||Date.now())));for(const value of document.querySelectorAll('[data-energy-value]'))value.textContent=e.energy;const countdown=document.querySelector('.energy-countdown');if(countdown){const s=Math.ceil(e.nextIn/1000);countdown.textContent=e.energy===50?'活跃度已满，出发吧！':`下 1 点约在 ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} 后恢复`;document.querySelector('.energy-orb b').innerHTML=e.energy+'<small>/50</small>'; }},1000);
+setInterval(()=>{void enforceFreeplayExpiry();const e=currentEconomy();if(!e||document.hidden)return;for(const value of document.querySelectorAll('[data-diamond-value]'))value.textContent=resourceCount(e,'diamonds');for(const time of document.querySelectorAll('[data-freeplay-time]'))time.textContent=formatTime(e.freeplayRemainingMs);const gardenClock=document.querySelector('[data-garden-countdown]');if(gardenClock&&state.data.garden)gardenClock.textContent=formatTime(state.data.garden.nextAt-(e.serverTime+Date.now()-(state.economyReceivedAt||Date.now())));for(const value of document.querySelectorAll('[data-energy-value]'))value.textContent=resourceCount(e,'energy');const countdown=document.querySelector('.energy-countdown');if(countdown){const s=Math.ceil(e.nextIn/1000);countdown.textContent=e.energy===50?'活跃度已满，出发吧！':`下 1 点约在 ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} 后恢复`;document.querySelector('.energy-orb b').innerHTML=e.energy+'<small>/50</small>'; }},1000);
 setInterval(()=>{if(state.data&&!document.hidden&&!state.busy){const before=JSON.stringify(state.data.garden);void api('economy').then(()=>{if(state.page==='garden'&&!overlay.innerHTML&&before!==JSON.stringify(state.data.garden))render();}).catch(()=>{});}},45000);
 function toast(message){clearTimeout(toastTimer);$('#toast').textContent=message;$('#toast').classList.add('visible');toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3600);}
 function sound(win=false) {
@@ -177,7 +186,8 @@ function changedLocation(){if(location.hash===observedHash)return;observedHash=l
 async function showHint(){
   if(state.busy)return;if(currentEconomy().hints<1)return showShop();state.busy=true;render();
   try{const b=state.battle,result=await api('level/hint',{level:b.level.id,revision:b.attempt.revision});b.attempt=result.attempt;hintSuggestion=result.suggestion?{...result.suggestion,level:b.level.id,revision:b.attempt.revision}:null;
-    modal(`${mascot()}<h2>芽芽的小提示</h2><p class="subtle">剩余提示 ${resourceCount(currentEconomy(),'hints')} 次；每点一次提示消耗 1 次。</p><p class="hint-content">${esc(pretty(result.hint))}</p>${result.steps?.length?'<ol class="hint-steps">'+result.steps.map(s=>'<li>'+esc(pretty(s))+'</li>').join('')+'</ol>':''}${result.suggestion?.formula?'<div class="hint-evidence"><b>'+esc(result.suggestion.name)+'</b><code>'+esc(pretty(result.suggestion.formula))+'</code></div>':''}<small class="subtle">提示不会替你出招。本次最高一颗星，重玩可重新挑战三星。</small>${result.canExpand?btn('hint','再具体一点','secondary wide'):''}${hintSuggestion?btn('prepare-hint','帮我选好这一步','primary wide'):''}${btn('close-modal','我来试试看','text-button')}`,'hint-modal');
+    const hintLimit=result.economy.unlimited?'提示不限次数。':`剩余提示 ${resourceCount(result.economy,'hints')} 次。`;
+    modal(`${mascot()}<h2>芽芽的小提示</h2><p class="subtle">${hintLimit}</p><p class="hint-content">${esc(pretty(result.hint))}</p>${result.steps?.length?'<ol class="hint-steps">'+result.steps.map(s=>'<li>'+esc(pretty(s))+'</li>').join('')+'</ol>':''}${result.suggestion?.formula?'<div class="hint-evidence"><b>'+esc(result.suggestion.name)+'</b><code>'+esc(pretty(result.suggestion.formula))+'</code></div>':''}<small class="subtle">提示不会替你出招。本次最高一颗星，重玩可重新挑战三星。</small>${result.canExpand?btn('hint','再具体一点','secondary wide'):''}${hintSuggestion?btn('prepare-hint','帮我选好这一步','primary wide'):''}${btn('close-modal','我来试试看','text-button')}`,'hint-modal');
   }catch(e){toast(e.message);}finally{state.busy=false;render();}
 }
 async function prepareHint(){
@@ -278,7 +288,7 @@ document.addEventListener('click',async event=>{
     if(action==='quality-apply'){if(state.busy)return toast('等当前这一步检查完成后，再应用清晰度。');location.reload();return;}
     if(action==='sound'){state.sound=!state.sound;localStorage.setItem('garden-sound',state.sound?'on':'off');if(state.sound)sound();render();if(overlay.innerHTML)settings();return;}
     if(action==='motion'){state.motion=!state.motion;localStorage.setItem('garden-motion',state.motion?'on':'off');render();settings();return;}
-    if(action==='reset-confirm'){modal(`<span class="large-card-icon">${icon('refresh')}</span><h2>重新开始整个冒险？</h2><p class="modal-description">这会清空当前浏览器的关卡进度、星星和技能。活跃度、商城背包和芽芽等级会保留，内测礼包不会重复发放。建议先导出存档备份。</p><a class="secondary wide" href="/api/save/export" download>先导出存档</a>${btn('reset-all','确认清空，重新出发','danger-button wide')}${btn('close-modal','保留我的花园','text-button')}`);return;}
+    if(action==='reset-confirm'){modal(`<span class="large-card-icon">${icon('refresh')}</span><h2>重新开始整个冒险？</h2><p class="modal-description">这会清空当前账号的关卡进度、星星和技能。背包和芽芽等级会保留。建议先导出存档备份。</p><a class="secondary wide" href="/api/save/export" download>先导出存档</a>${btn('reset-all','确认清空，重新出发','danger-button wide')}${btn('close-modal','保留我的花园','text-button')}`);return;}
     if(action==='reset-all'){state.data=await api('progress/reset',{confirm:'RESET'});state.page='home';state.battle=null;selection=newSelection();state.story=0;afterStory=null;commitLocation('replace');closeModal();return render();}
     if(action==='retry-boot')return boot();
   }catch(e){toast(e.message);}

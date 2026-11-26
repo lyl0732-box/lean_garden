@@ -9,8 +9,8 @@ android {
         applicationId 'cn.leangarden.client'
         minSdk 26
         targetSdk 36
-        versionCode 22
-        versionName '0.13.4'
+        versionCode 23
+        versionName '0.13.5'
     }
     signingConfigs {
         local {

@@ -20,6 +20,6 @@ if(!process.argv.includes('--prepare-only')){
   await run(path.join(tools.jdk,'bin/java.exe'),['-jar',path.join(tools.buildTools,'lib/apksigner.jar'),'verify','--verbose','--print-certs',apk]);
   const bytes=await readFile(apk);await writeFile(path.join(out,'build-report.json'),JSON.stringify({date:new Date().toISOString(),file:path.basename(apk),bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),minAndroid:8,targetAPI:36,signature:'existing local test identity; not a store release identity',runtimeDeviceTested:false},null,2));console.log('APK ready:',apk,bytes.length,'bytes');
   await mkdir('public/downloads',{recursive:true});await copyFile(apk,path.join('public/downloads',path.basename(apk)));
-  const release={schema:1,package:'cn.leangarden.client',versionName:version,versionCode:Number(/versionCode\s+(\d+)/.exec(gradle)[1]),url:'/downloads/'+path.basename(apk),bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),notes:'无广告、无内购版。已有免广告券可作为活力券继续使用。'};
+  const release={schema:1,package:'cn.leangarden.client',versionName:version,versionCode:Number(/versionCode\s+(\d+)/.exec(gradle)[1]),url:'/downloads/'+path.basename(apk),bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),notes:'无广告、无内购。活跃度、钻石、提示包、答案包和自由选关时长均为无限。'};
   await writeFile('public/android-release.json',JSON.stringify(release,null,2));
 }

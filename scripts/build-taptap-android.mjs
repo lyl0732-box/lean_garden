@@ -17,6 +17,7 @@ for(const url of new Set(['/index.html','/assets/favicon.svg',...preload.common.
 }
 function replaceRequired(text,pattern,replacement,label){if(!pattern.test(text))throw Error('Source changed: '+label);pattern.lastIndex=0;return text.replace(pattern,replacement);}
 let app=await readFile(path.join(web,'app.js'),'utf8');
+app=replaceRequired(app,/const GAME_EDITION='ad-free';/,"const GAME_EDITION='taptap';",'TapTap edition');
 app=replaceRequired(app,/'shop\/redeem'/,"'shop/purchase'",'diamond exchange compatibility');
 const aiDisclosure=JSON.parse(await readFile('clients/taptap-minigame/ai-disclosure.json','utf8'));
 app=replaceRequired(app,/<p class="settings-foot">/,`<section class="ai-disclosure-details" aria-label="AI 内容声明"><h3>${aiDisclosure.label}声明</h3><p>${aiDisclosure.full}</p></section><p class="settings-foot">`,'AI settings disclosure');
