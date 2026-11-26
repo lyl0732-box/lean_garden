@@ -5,17 +5,15 @@ import { networkInterfaces } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { levels, chapters, cards, campaign, byId, canEnter, unlocked, actionsFor, publicLevel } from './content.mjs';
 import { checkLean, sourceFor, root, engineHealth } from './lean.mjs';
-import { initStore, getProfile, profileById, save, exclusive } from './store.mjs';
+import { initStore, getProfile, save, exclusive } from './store.mjs';
 import { repository, selectedRewrite, selectedApply, selectedInduction, introductions } from './rewrite.mjs';
 import { nextHint } from './hints.mjs';
 import {activeProfile} from './freeplay.mjs';
 import {explainLeanError} from './error-guide.mjs';
 import {selectedWitness,actionTarget} from './witness.mjs';
-import {economySummary,beginRun,awardRun,useHint,useAnswer,claimBeta,refillEnergy,claimTrial,changeFreeplay,requireFreeplayTime,attachBenefits,expireFreeplay} from './economy.mjs';
+import {economySummary,beginRun,awardRun,useHint,useAnswer,claimBeta,refillEnergy,claimTrial,changeFreeplay,requireFreeplayTime,attachBenefits,expireFreeplay,shopInfo,buyWithDiamonds} from './economy.mjs';
 import {claimCheckin} from './checkin.mjs';
 import {selectedRewriteCode} from './rewrite-code.mjs';
-import {shopInfo,purchase,topup,startRewardAd,finishRewardAd,configureRewardAds} from './commerce.mjs';
-import {configuredAppwin} from './appwin.mjs';
 import {initAccounts,sessionAccount,accountProfile,publicAccount,legacyPreview,login,register,logout,passwordHint,sessionCookie,rememberedAccount,resumeRemembered,rememberAccount,rememberCookie} from './accounts.mjs';
 import {refreshQuizzes,quizSummary,quizFor,answerQuiz} from './garden-quiz.mjs';
 import {Presence} from './presence.mjs';
@@ -54,10 +52,9 @@ function send(res,status,value) {res.writeHead(status,{'Content-Type':'applicati
 const engineFailure=result=>{if(result.engineError)throw fail(503,'本机证明引擎暂时不可用。'+result.engineError.slice(0,220));};
 function exportEconomy(owner){const e=structuredClone(owner.economy);e.garden.questions=e.garden.questions.map(({correct,...q})=>q);delete e.adSessions;return e;}
 
-export async function createServer({allowGuestForTests=false,publicRoot,managementSocket=null,presence=new Presence(),rewardAds}={}) {
+export async function createServer({allowGuestForTests=false,publicRoot,managementSocket=null,presence=new Presence()}={}) {
   await initStore();
   await initAccounts();
-  if(rewardAds!==undefined)configureRewardAds(rewardAds);
   const publicDir=publicRoot?path.resolve(publicRoot):path.join(root,'public'),authRates=new Map();
   const management=managementSocket?await startManagement(managementSocket,{presence}):null;
   const server=http.createServer(async(req,res)=>{
@@ -66,14 +63,6 @@ export async function createServer({allowGuestForTests=false,publicRoot,manageme
     res.setHeader('Content-Security-Policy',"default-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'");
     try {
       const url=new URL(req.url,'http://localhost');
-      if(url.pathname==='/api/ads/appwin/reward'){
-        if(req.method!=='GET'||req.url.length>8192||!rewardAds?.ready)return send(res,200,{isValid:false});
-        const isValid=await rewardAds.acceptCallback(url.searchParams,async(ownerId,sessionId)=>{
-          const owner=profileById(ownerId);if(!owner)throw fail(404,'广告账号不存在。');
-          await exclusive(owner,async()=>{await finishRewardAd(owner,{sessionId});await save();});
-        });
-        return send(res,200,{isValid});
-      }
       if(url.pathname==='/api/health') return send(res,200,await engineHealth());
       if(url.pathname.startsWith('/api/')) {
         const origin=req.headers.origin;
@@ -128,12 +117,12 @@ export async function createServer({allowGuestForTests=false,publicRoot,manageme
           if(url.pathname==='/api/checkin/claim'){const result=claimCheckin(owner);await save();return send(res,200,{...result,economy:economySummary(owner)});}
           if(url.pathname==='/api/shop/claim-beta'){claimBeta(owner);await save();return send(res,200,{economy:economySummary(owner)});}
           if(url.pathname==='/api/shop/claim-trial'){claimTrial(owner);await save();return send(res,200,{economy:economySummary(owner)});}
-          if(url.pathname==='/api/shop/purchase'){const receipt=await purchase(owner,body);await save();return send(res,200,{...receipt,economy:economySummary(owner)});}
-          if(url.pathname==='/api/shop/topup'){const receipt=await topup(owner,body);await save();return send(res,200,{...receipt,economy:economySummary(owner)});}
+          // Published TapTap clients use the original route for diamond exchanges.
+          if(['/api/shop/redeem','/api/shop/purchase'].includes(url.pathname)){
+            const receipt=buyWithDiamonds(owner,body);await save();return send(res,200,{...receipt,economy:economySummary(owner)});
+          }
           if(url.pathname==='/api/garden/answer'){const result=answerQuiz(owner,body.id,body.choice);await save();return send(res,200,{result,economy:economySummary(owner),garden:quizSummary(owner)});}
           if(url.pathname==='/api/energy/refill'){refillEnergy(owner);await save();return send(res,200,{economy:economySummary(owner)});}
-          if(['/api/energy/ad/start','/api/ads/start'].includes(url.pathname)){const session=await startRewardAd(owner,url.pathname.startsWith('/api/energy')?'energy':'diamonds');await save();return send(res,200,session);}
-          if(['/api/energy/ad/complete','/api/ads/complete'].includes(url.pathname)){const reward=await finishRewardAd(owner,body.receipt);await save();return send(res,200,{...reward,economy:economySummary(owner)});}
           if(url.pathname==='/api/onboarding/seen'){
             owner.prologueSeen=true;await save();return send(res,200,{ok:true});
           }
@@ -288,8 +277,7 @@ export async function createServer({allowGuestForTests=false,publicRoot,manageme
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)) {
   const port=Number(process.env.PORT||3210);
   const host=process.env.HOST||'127.0.0.1';
-  const rewardAds=await configuredAppwin(dataDir);
-  const server=await createServer({managementSocket:process.platform==='linux'?(process.env.GARDEN_ADMIN_SOCKET||path.join(dataDir,'admin.sock')):null,rewardAds});
+  const server=await createServer({managementSocket:process.platform==='linux'?(process.env.GARDEN_ADMIN_SOCKET||path.join(dataDir,'admin.sock')):null});
   server.listen(port,host,()=>{
     console.log(`Lean Garden: http://localhost:${port}`);
     for(const codes of [[],['rfl']])checkLean(byId.get('n01'),codes).catch(error=>console.error('First-level warmup:',error.message));

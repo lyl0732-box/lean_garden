@@ -32,10 +32,12 @@ Android 工程固定 compileSdk／targetSdk 36、buildTools 36.0.0、Gradle 8.11
 
 在根目录运行 `npm run build:assets`、`node scripts/build-android.mjs --prepare-only` 后，进入 `clients/android`，通过 Android Studio 或 `gradlew.bat assembleRelease --no-daemon` 构建；APK 位于 `app/build/outputs/apk/release/`。`--prepare-only` 只准备内置资源，不需要作者的工具 JSON。
 
-友盟 AppKey 与广告位 ID 是客户端公开标识。服务端奖励密钥是私密配置，配置方法见 [友盟广告接入](友盟广告接入.md)，不能提交到 Git。
+直发 Android 从 0.13.4 起移除友盟 Union 广告依赖和原生广告桥接，继续使用 U-App 统计和 U-APM 性能监控。旧广告密钥与数据仍按私密文件管理。
 
 ## 更新仓库与服务器
 
 按用户要求，每次修正完成并通过相关验证后，都提交并推送到本仓库；项目协作规则记在根目录 [AGENTS.md](../AGENTS.md)。
+
+默认构建 Windows、直发 Android 和网页版的无广告、无现金内购版本。TapTap APK 与小游戏使用单独的构建命令和下载目录，按用户的发布要求更新。[TapTap 两种包体](TAPTAP.md)
 
 先运行相应验证，`git add` 后执行 `node scripts/check-git-export.mjs` 检查暂存区，再提交和推送。这个检查不会连接服务器或修改账号。上传 GitHub 不等于发布游戏；根目录的云端推送脚本另行部署代码，并排除数据库和私钥。

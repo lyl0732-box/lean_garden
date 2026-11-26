@@ -1,6 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {migrateEconomy,economySummary,beginRun,awardRun,useHint,useAnswer,claimBeta,refillEnergy,grantPurchase,growth,threshold,creditDiamonds} from '../server/economy.mjs';
-import {paymentMode,purchase,configureCommerce,startRewardAd,finishRewardAd} from '../server/commerce.mjs';
+import {migrateEconomy,economySummary,beginRun,awardRun,useHint,useAnswer,claimBeta,refillEnergy,grantPurchase,growth,threshold} from '../server/economy.mjs';
 import {evolvedMascot,evolution} from '../public/yaya-forms.js';
 
 const make=(now=1000000)=>{const p={id:'test',completed:{}};migrateEconomy(p,[],now);return p;};
@@ -29,16 +28,4 @@ test('each paid run rewards XP once; migration preserves proofs and all eight ma
   const levels=[1,3,5,8,11,14,18,22];assert.equal(new Set(levels.map(evolvedMascot)).size,8);
   const old={completed:{n01:{stars:3,proof:['rfl']},n07:{stars:2}},attempts:{n02:{steps:[]}}},before=structuredClone(old);
   migrateEconomy(old,[{id:'n01'},{id:'n07',miniBoss:true}],1000000);assert.equal(old.economy.xp,300);assert.deepEqual(old.completed,before.completed);assert.deepEqual(old.attempts,before.attempts);
-});
-test('payments are disabled by default; verified adapter receipts are idempotent, and ads require verified provider rewards',async()=>{
-  const p=make();assert.equal(paymentMode(),'disabled');await assert.rejects(purchase(p,{product:'adSkips10',key:'request-0000000001'}),e=>e.code==='PAYMENT_UNAVAILABLE');assert.equal(p.economy.hints,5);
-  await assert.rejects(startRewardAd(p),e=>e.code==='ADS_UNAVAILABLE');await assert.rejects(finishRewardAd(p,'forged'),e=>e.code==='ADS_UNAVAILABLE');
-  try{
-    configureCommerce({payments:{async verifyPurchase(){return {id:'verified-receipt1'};}},ads:{async createSession(){return {id:'ad1'};},async verifyReward({receipt}){return receipt==='signed'?{id:'reward1',sessionId:'ad1'}:null;}}});
-    creditDiamonds(p,100,'qa-earned');await purchase(p,{product:'hints10',key:'request-0000000001'});await purchase(p,{product:'hints10',key:'request-0000000001'});assert.equal(p.economy.hints,15);assert.equal(p.economy.diamonds,0);
-    await purchase(p,{product:'adSkips10',key:'cash-request-000001'});await purchase(p,{product:'adSkips10',key:'cash-request-000001'});assert.equal(p.economy.adSkips,10);assert.equal(p.economy.diamonds,0);
-    await assert.rejects(purchase(p,{product:'adSkips10',key:'request-0000000001'}));assert.deepEqual(await startRewardAd(p,'energy',1000000),{id:'ad1'});
-    beginRun(p,{},1000000);await assert.rejects(finishRewardAd(p,'forged',1000000));assert.equal((await finishRewardAd(p,'signed',1000000)).earned,50);assert.equal((await finishRewardAd(p,'signed',1000000)).duplicate,true);assert.equal(p.economy.energy,50);
-
-  }finally{configureCommerce();}
 });

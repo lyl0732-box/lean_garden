@@ -11,7 +11,7 @@
 
 两端均连接 `https://162.14.77.140/`，使用原账号登录，进度保存在服务器。Lean 验证必须联网，不包含手机上独立运行的 Lean/Mathlib。保留 107 个冒险关卡和 6 个小游戏副本，共 113 关。
 
-两个包均移除了友盟广告。Android 自测包同时移除友盟 U-App、U-APM、Union、APM Gradle 插件及其 Application/广告桥接；小游戏没有任何这些 SDK。原网盘渠道的 `clients/android/` 保留，以免覆盖其它渠道。
+两个包均移除了友盟广告。Android 自测包同时移除友盟 U-App、U-APM、Union、APM Gradle 插件及其 Application/广告桥接；小游戏没有任何这些 SDK。直发 Android 的常规更新产物在 `dist/android/`，TapTap 包单独构建。
 
 ## APK 上传及买断售卖
 
@@ -42,7 +42,7 @@ APK 固定使用安装包中的前端代码与媒体；不再从原网盘渠道�
 - 仅 `res.isEnded === true` 才返回“完整观看”；提前关闭、异常回调、加载成功都不算完成。
 - 防止并发播放，移除监听，重复关闭不会重复完成。
 
-当前尚未开通广告位，所以 `config.js` 中 `rewardedVideoAdUnitId` 留空，入口显示待开通且不会创建广告实例。开通后填入 **TapTap adUnitId** 并重新构建即可启用官方播放接口。当前没有为 TapTap 广告接入服务器奖励结算，因此即使完整观看也不会发放钻石/活跃度；不要调用原友盟的 `/api/ads/*` 结算接口。后续需要配置广告位并单独接通奖励结算，再做真实广告验证。
+当前尚未开通广告位，所以 `config.js` 中 `rewardedVideoAdUnitId` 留空，入口显示待开通且不会创建广告实例。开通后填入 **TapTap adUnitId** 并重新构建即可启用官方播放接口。当前没有为 TapTap 广告接入服务器奖励结算，因此即使完整观看也不会发放钻石/活跃度。后续需要配置广告位并接通 TapTap 专用奖励结算，再做真实广告验证。
 
 ## 构建和验证
 

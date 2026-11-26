@@ -8,7 +8,7 @@ public final class MainActivity extends Activity {
   private String serverURL,quality="high";private View fullView;private WebChromeClient.CustomViewCallback fullCallback;private String[] pendingDownload;
   private ScrollView connectionScroll;private int safeLeft,safeTop,safeRight,safeBottom,keyboardBottom;
   private boolean returningToConnection=false;
-  private RewardAds rewardAds;private AppUpdates appUpdates;
+  private AppUpdates appUpdates;
   private ResourceCache resources;private final java.util.concurrent.ExecutorService updates=java.util.concurrent.Executors.newSingleThreadExecutor();
   private int dp(int n){return (int)(n*getResources().getDisplayMetrics().density+.5f);}
   private TextView text(String value,int size){TextView t=new TextView(this);t.setText(value);t.setTextSize(size);t.setTextColor(Color.rgb(75,102,65));t.setGravity(Gravity.CENTER);t.setPadding(dp(10),dp(9),dp(10),dp(9));return t;}
@@ -25,7 +25,7 @@ public final class MainActivity extends Activity {
   private String readPassword(String target,String name){try{if(!target.equals(getPreferences(0).getString("remember_server",""))||!name.equals(getPreferences(0).getString("remember_name","")))return "";byte[] all=android.util.Base64.decode(getPreferences(0).getString("password_cipher",""),android.util.Base64.NO_WRAP);if(all.length<29)return "";javax.crypto.Cipher c=javax.crypto.Cipher.getInstance("AES/GCM/NoPadding");c.init(javax.crypto.Cipher.DECRYPT_MODE,credentialKey(),new javax.crypto.spec.GCMParameterSpec(128,java.util.Arrays.copyOfRange(all,0,12)));c.updateAAD((target+"\n"+name).getBytes(java.nio.charset.StandardCharsets.UTF_8));return new String(c.doFinal(java.util.Arrays.copyOfRange(all,12,all.length)),java.nio.charset.StandardCharsets.UTF_8);}catch(Exception e){getPreferences(0).edit().remove("password_cipher").apply();return "";}}
 
   @Override public void onCreate(Bundle state){
-    super.onCreate(state);resources=new ResourceCache(this);rewardAds=new RewardAds(this);appUpdates=new AppUpdates(this);serverURL=getPreferences(0).getString("server",defaultURL).replaceAll("/+$","");quality=validQuality(getPreferences(0).getString("quality","high"));
+    super.onCreate(state);resources=new ResourceCache(this);appUpdates=new AppUpdates(this);serverURL=getPreferences(0).getString("server",defaultURL).replaceAll("/+$","");quality=validQuality(getPreferences(0).getString("quality","high"));
     Window window=getWindow();window.setStatusBarColor(Color.TRANSPARENT);window.setNavigationBarColor(Color.TRANSPARENT);
     if(Build.VERSION.SDK_INT>=28){WindowManager.LayoutParams params=window.getAttributes();params.layoutInDisplayCutoutMode=Build.VERSION.SDK_INT>=30?WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS:WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;window.setAttributes(params);}
     if(Build.VERSION.SDK_INT>=29){window.setStatusBarContrastEnforced(false);window.setNavigationBarContrastEnforced(false);}
@@ -128,7 +128,7 @@ public final class MainActivity extends Activity {
       @Override public WebResourceResponse shouldInterceptRequest(WebView view,WebResourceRequest request){return "GET".equals(request.getMethod())&&own(request.getUrl().toString())?resources.intercept(request.getUrl()):null;}
       @Override public void onPageCommitVisible(WebView view,String url){updateWebInsets();}
       @Override public void onPageFinished(WebView view,String url){updateWebInsets();}
-      @Override public boolean shouldOverrideUrlLoading(WebView view,WebResourceRequest request){String url=request.getUrl().toString();if(request.isForMainFrame()&&"leangarden".equals(request.getUrl().getScheme())&&"reward-ad".equals(request.getUrl().getHost())){if(own(view.getUrl()))playRewardAd(view,request.getUrl());return true;}if(request.isForMainFrame()&&url.equals("leangarden://update")){if(own(view.getUrl()))appUpdates.check(serverURL);return true;}if(request.isForMainFrame()&&url.equals("leangarden://exit")){finishAndRemoveTask();return true;}if(request.isForMainFrame()&&url.equals("leangarden://connection")){showConnection("");return true;}if(own(url))return false;if(request.isForMainFrame()&&(url.startsWith("https://")||url.startsWith("http://")))try{startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(url)));}catch(Exception ignored){}return true;}
+      @Override public boolean shouldOverrideUrlLoading(WebView view,WebResourceRequest request){String url=request.getUrl().toString();if(request.isForMainFrame()&&url.equals("leangarden://update")){if(own(view.getUrl()))appUpdates.check(serverURL);return true;}if(request.isForMainFrame()&&url.equals("leangarden://exit")){finishAndRemoveTask();return true;}if(request.isForMainFrame()&&url.equals("leangarden://connection")){showConnection("");return true;}if(own(url))return false;if(request.isForMainFrame()&&(url.startsWith("https://")||url.startsWith("http://")))try{startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(url)));}catch(Exception ignored){}return true;}
       @Override public void onReceivedError(WebView view,WebResourceRequest request,WebResourceError error){if(request.isForMainFrame())showConnection("暂时无法连接花园，请确认本机服务和 Tailscale 已开启。");}
     });
     web.setWebChromeClient(new WebChromeClient(){
@@ -138,19 +138,10 @@ public final class MainActivity extends Activity {
     web.setDownloadListener((url,agent,disposition,mime,length)->{if(!own(url))return;pendingDownload=new String[]{url,agent,disposition,mime};if(Build.VERSION.SDK_INT<29&&checkSelfPermission("android.permission.WRITE_EXTERNAL_STORAGE")!=PackageManager.PERMISSION_GRANTED)requestPermissions(new String[]{"android.permission.WRITE_EXTERNAL_STORAGE"},10);else saveDownload();});
     web.loadUrl(Uri.parse(serverURL).buildUpon().appendQueryParameter("garden-quality",quality).build().toString());applyContentInsets();enterImmersive();
   }
-  private void playRewardAd(final WebView source,Uri uri){
-    final String request=uri.getQueryParameter("request"),session=uri.getQueryParameter("session");
-    if(request==null||session==null||!request.matches("[a-zA-Z0-9-]{20,80}")||!session.matches("[a-zA-Z0-9-]{20,80}"))return;
-    rewardAds.show(session,(status,message)->runOnUiThread(()->{
-      if(source!=web||isFinishing()||isDestroyed()||!own(source.getUrl()))return;
-      try{org.json.JSONObject result=new org.json.JSONObject();result.put("request",request);result.put("status",status);result.put("message",message);source.evaluateJavascript("window.dispatchEvent(new CustomEvent('garden:reward-ad-result',{detail:"+result.toString()+"}))",null);}catch(org.json.JSONException ignored){}
-      enterImmersive();
-    }));
-  }
   private void saveDownload(){if(pendingDownload==null)return;String[] item=pendingDownload;pendingDownload=null;try{DownloadManager.Request r=new DownloadManager.Request(Uri.parse(item[0]));String cookie=CookieManager.getInstance().getCookie(item[0]);if(cookie!=null)r.addRequestHeader("Cookie",cookie);r.addRequestHeader("User-Agent",item[1]);r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,URLUtil.guessFileName(item[0],item[2],item[3]));((DownloadManager)getSystemService(DOWNLOAD_SERVICE)).enqueue(r);Toast.makeText(this,"正在保存到下载目录。",Toast.LENGTH_SHORT).show();}catch(Exception e){Toast.makeText(this,"暂时未能保存，请在浏览器中导出。",Toast.LENGTH_LONG).show();}}
   @Override public void onRequestPermissionsResult(int code,String[] permissions,int[] results){super.onRequestPermissionsResult(code,permissions,results);if(code==10&&results.length>0&&results[0]==PackageManager.PERMISSION_GRANTED)saveDownload();}
   @Override public void onBackPressed(){if(fullView!=null){web.getWebChromeClient().onHideCustomView();}else if(web!=null&&web.canGoBack())web.goBack();else if(web!=null)showConnection("");else super.onBackPressed();}
   @Override public void onPause(){if(web!=null){captureQuality(()->{});web.onPause();}CookieManager.getInstance().flush();super.onPause();}
   @Override public void onResume(){super.onResume();if(appUpdates!=null)appUpdates.resume();if(web!=null)web.onResume();enterImmersive();}
-  @Override public void onDestroy(){updates.shutdownNow();if(appUpdates!=null)appUpdates.destroy();if(rewardAds!=null)rewardAds.destroy();if(web!=null)web.destroy();super.onDestroy();}
+  @Override public void onDestroy(){updates.shutdownNow();if(appUpdates!=null)appUpdates.destroy();if(web!=null)web.destroy();super.onDestroy();}
 }

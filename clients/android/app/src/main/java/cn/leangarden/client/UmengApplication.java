@@ -4,10 +4,8 @@ import android.app.Application;
 import com.umeng.commonsdk.UMConfigure;
 import android.os.Bundle;
 import com.umeng.umcrash.UMCrash;
-import com.umeng.union.UMUnionSdk;
 
 public class UmengApplication extends Application {
-    public static volatile boolean adsReady=false;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -43,13 +41,6 @@ public class UmengApplication extends Application {
                     UMConfigure.DEVICE_TYPE_PHONE,
                     null
                 );
-                try {
-                    UMUnionSdk.setAdAutoLoadEnable(false);
-                    UMUnionSdk.init(UmengApplication.this);
-                    adsReady=true;
-                } catch(RuntimeException error) {
-                    android.util.Log.e("GardenAds","Advertising initialization failed",error);
-                }
             }
         }).start();
     }

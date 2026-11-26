@@ -16,12 +16,11 @@ import {branchTitle,symbolGuide} from './learning.js';
 import {parseRoute,routeFor} from './routes.js';
 import {readQuality,saveQuality,qualityChoices} from './quality.js';
 import {energyPill,energyView,shopView,evolvedMascot,evolution} from './economy-v011.js';
-import {diamondPill,formatTime,gem,resourceCount} from './shop.js';
+import {diamondPill,formatTime,gem,resourceCount,diamondProducts} from './shop.js';
 import {growthView} from './yaya-forms.js';
 import {questionView,resultView} from './garden-quiz.js';
 import {installPresence} from './presence.js';
-import {rewardAdOffer,watchNativeReward} from './reward-ads.js';
-import {authorLinks,checkinView,rewriteEditorSource} from './plan9.js';
+import {authorLinks,checkinView,checkinRewardLabel,rewriteEditorSource} from './plan9.js';
 import {checkWebUpdate,GAME_VERSION} from './update-check.js';
 
 
@@ -63,7 +62,7 @@ function currentEconomy(){
   return {...e,energy,nextIn:energy===50?0:Math.max(0,e.nextIn+recovered*e.interval-elapsed),freeplayRemainingMs:e.unlimited?Number.MAX_SAFE_INTEGER:Math.max(0,e.freeplayRemainingMs-(e.freeplayActive?elapsed:0))};
 }
 function showCheckin(){modal(checkinView(currentEconomy().checkin,btn),'checkin-modal');}
-async function collectCheckin(){if(walletBusy)return;walletBusy=true;try{const r=await api('checkin/claim',{});render();showCheckin();if(!r.duplicate){rewardSound(state.sound);toast('签到成功：'+r.reward.label);}}catch(e){toast(e.message);}finally{walletBusy=false;}}
+async function collectCheckin(){if(walletBusy)return;walletBusy=true;try{const r=await api('checkin/claim',{});render();showCheckin();if(!r.duplicate){rewardSound(state.sound);toast('签到成功：'+checkinRewardLabel(r.reward));}}catch(e){toast(e.message);}finally{walletBusy=false;}}
 let expiringFreeplay=false;
 async function enforceFreeplayExpiry(){
   const e=currentEconomy();if(!state.data?.progress.freePlay||!e||e.unlimited||e.freeplayActive&&e.freeplayRemainingMs>0||expiringFreeplay||state.busy)return;
@@ -74,41 +73,19 @@ async function enforceFreeplayExpiry(){
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)void enforceFreeplayExpiry();});
 async function showShop(){return navigate('shop');}
 function shop(){return shopView(currentEconomy(),state.data.shop,btn,state.shopFilter||'all');}
-async function showEnergy(){const r=await api('economy');state.data.shop=r.shop;const offer=rewardAdOffer(r.shop);modal(energyView(currentEconomy(),offer.available,btn,offer.label),'energy-modal');}
-async function watchReward(purpose){
-  if(state.adBusy)return;
-  const offer=rewardAdOffer(state.data.shop);if(!offer.available){toast(offer.note);return;}
-  state.adBusy=true;
-  for(const b of document.querySelectorAll('[data-action="watch-ad"],[data-action="watch-diamond-ad"]'))b.disabled=true;
-  try{
-    const ad=await api(purpose==='energy'?'energy/ad/start':'ads/start',{});
-    closeModal();toast('正在准备广告…');music.pause();
-    const result=await watchNativeReward(ad);
-    if(result.status==='error')throw Error(result.message||'广告暂时不可用，请稍后重试。');
-    if(result.status==='cancelled'){await api('economy');toast(result.message||'本次没有扣除领取次数。');return;}
-    if(result.status!=='rewarded')throw Error('广告结果无效，请稍后重试。');
-    toast('正在确认广告奖励…');
-    for(let i=0;i<16;i++){
-      try{
-        const r=await api('ads/complete',{receipt:{sessionId:ad.id}});
-        toast(purpose==='energy'?'奖励已到账，活跃度已恢复。':'广告奖励已到账：50 钻石。');return r;
-      }catch(error){if(error.code!=='AD_REWARD_PENDING')throw error;if(i<15)await new Promise(r=>setTimeout(r,2000));}
-    }
-    toast('平台确认较慢，到账后会自动更新余额。');
-  }catch(error){toast(error.message);}finally{state.adBusy=false;await music.start();render();}
-}
+async function showEnergy(){const r=await api('economy');state.data.shop=r.shop;modal(energyView(currentEconomy(),btn),'energy-modal');}
 function showGrowth(){modal(growthView(currentEconomy(),false)+(state.data.pendingCards?.length||state.data.pendingTopics?.length?btn('claim-cards','✦ 领取通关礼物','primary wide'):'')+btn('close-modal','继续冒险','secondary wide'),'growth-modal');}
 let walletBusy=false;
 async function walletAction(path,body,view='shop'){
   if(walletBusy)return;walletBusy=true;
   try{await api(path,body);render();if(view==='energy')await showEnergy();else await showShop();}catch(error){toast(error.message);}finally{walletBusy=false;}
 }
-function confirmPurchase(product){
-  const p=state.data.shop.products.find(p=>p.id===product);if(!p)return;
-  const cash=p.currency==='cash',e=currentEconomy();if(cash&&state.data.shop.topupMode==='disabled')return toast('现金支付尚未接入，免广告券不能用钻石兑换。');
-  if(!cash&&e.diamonds<p.priceDiamonds){modal('<h2>还差一点点星光</h2><p>这份补给需要 '+p.priceDiamonds+' 钻石，你现在有 '+e.diamonds+' 钻石。</p><p>可以回答花园里的小问题来获得钻石。</p>'+btn('nav','去禅净花园','primary wide','data-page="garden"')+btn('close-modal','回小铺逛逛','text-button'),'purchase-modal');return;}
+function confirmRedemption(product){
+  const p=diamondProducts(state.data.shop).find(p=>p.id===product);if(!p)return;
+  const e=currentEconomy();
+  if(e.diamonds<p.priceDiamonds){modal('<h2>还差一点点星光</h2><p>这份补给需要 '+p.priceDiamonds+' 钻石，你现在有 '+e.diamonds+' 钻石。</p><p>通过花园问答和签到可以获得钻石。</p>'+btn('nav','去禅净花园','primary wide','data-page="garden"')+btn('close-modal','回小铺逛逛','text-button'),'purchase-modal');return;}
   const key=Array.from(crypto.getRandomValues(new Uint8Array(16)),n=>n.toString(16).padStart(2,'0')).join('');
-  modal('<span class="eyebrow">一点补给，继续冒险</span><h2>'+esc(p.name)+'</h2><p>'+esc(p.description)+'</p><p class="shop-price">'+(cash?'¥ '+(p.priceFen/100):gem()+p.priceDiamonds+' 钻石')+'</p><p>'+(cash?'仅通过现金支付购买，不消耗钻石。':'确认后从钻石余额中扣除，补给立即进入背包。')+'</p>'+btn('purchase-now',cash?'继续现金支付':'确认用钻石兑换','primary wide','data-product="'+p.id+'" data-key="'+key+'"')+btn('close-modal','再想一想','text-button'),'purchase-modal');
+  modal('<h2>'+esc(p.name)+'</h2><p>'+esc(p.description)+'</p><p class="shop-price">'+gem()+p.priceDiamonds+' 钻石</p>'+btn('redeem-now','确认用钻石兑换','primary wide','data-product="'+p.id+'" data-key="'+key+'"')+btn('close-modal','再想一想','text-button'),'purchase-modal');
 }
 async function openQuiz(id){const r=await api('garden/quiz?id='+encodeURIComponent(id));modal(questionView(r.question,cardById(r.question.cardId),btn),'quiz-modal');}
 async function submitQuiz(id){
@@ -128,7 +105,6 @@ async function revealAnswer(){
 }
 setInterval(()=>{void enforceFreeplayExpiry();const e=currentEconomy();if(!e||document.hidden)return;for(const value of document.querySelectorAll('[data-diamond-value]'))value.textContent=resourceCount(e,'diamonds');for(const time of document.querySelectorAll('[data-freeplay-time]'))time.textContent=formatTime(e.freeplayRemainingMs);const gardenClock=document.querySelector('[data-garden-countdown]');if(gardenClock&&state.data.garden)gardenClock.textContent=formatTime(state.data.garden.nextAt-(e.serverTime+Date.now()-(state.economyReceivedAt||Date.now())));for(const value of document.querySelectorAll('[data-energy-value]'))value.textContent=e.energy;const countdown=document.querySelector('.energy-countdown');if(countdown){const s=Math.ceil(e.nextIn/1000);countdown.textContent=e.energy===50?'活跃度已满，出发吧！':`下 1 点约在 ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} 后恢复`;document.querySelector('.energy-orb b').innerHTML=e.energy+'<small>/50</small>'; }},1000);
 setInterval(()=>{if(state.data&&!document.hidden&&!state.busy){const before=JSON.stringify(state.data.garden);void api('economy').then(()=>{if(state.page==='garden'&&!overlay.innerHTML&&before!==JSON.stringify(state.data.garden))render();}).catch(()=>{});}},45000);
-window.addEventListener('garden:reward-ad-receipt',event=>{if(event.detail?.receipt)void walletAction('ads/complete',{receipt:event.detail.receipt},state.page==='battle'?'energy':'shop');});
 function toast(message){clearTimeout(toastTimer);$('#toast').textContent=message;$('#toast').classList.add('visible');toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3600);}
 function sound(win=false) {
   if(!state.sound)return;
@@ -239,14 +215,12 @@ document.addEventListener('click',async event=>{
     if(action==='logout')return confirmExit(true);
     if(action==='exit-now')return leaveGame(true);
     if(action==='logout-now')return leaveGame(false);
-    if(action==='watch-diamond-ad')return watchReward('diamonds');
     if(action==='energy')return showEnergy();
     if(action==='growth')return showGrowth();
     if(action==='claim-beta')return walletAction('shop/claim-beta',{});
     if(action==='refill-energy')return walletAction('energy/refill',{},'energy');
-    if(action==='watch-ad')return watchReward('energy');
-    if(action==='buy-product')return confirmPurchase(target.dataset.product);
-    if(action==='purchase-now')return walletAction('shop/purchase',{product:target.dataset.product,key:target.dataset.key});
+    if(action==='buy-product')return confirmRedemption(target.dataset.product);
+    if(action==='redeem-now')return walletAction('shop/redeem',{product:target.dataset.product,key:target.dataset.key});
     if(action==='answer')return showAnswer();
     if(action==='answer-now')return revealAnswer();
     if(action==='freeplay')return toggleFreeplay();

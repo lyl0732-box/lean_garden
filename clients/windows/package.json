@@ -1,6 +1,6 @@
 {
   "name": "lean-garden-client",
-  "version": "0.13.3",
+  "version": "0.13.4",
   "private": true,
   "description": "Lean Garden online Windows client",
   "main": "main.cjs",

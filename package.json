@@ -1,6 +1,6 @@
 {
   "name": "lean-garden",
-  "version": "0.13.3",
+  "version": "0.13.4",
   "private": true,
   "type": "module",
   "description": "Button-driven Lean proof adventure, verified locally by Lean 4",

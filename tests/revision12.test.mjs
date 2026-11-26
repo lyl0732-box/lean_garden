@@ -14,7 +14,7 @@ test('remembered credentials are opaque, can resume after logout, and can be exp
   const owner=accountProfile(sessionAccount('garden_session='+cookies.get('garden_session')));Object.assign(owner.economy,{hints:0,answers:0,adSkips:0,diamonds:0,freeplayMs:0,energy:0,energyAt:Date.now()});
   await req('economy');useHint(owner);assert.equal(owner.economy.hints,0);const attempt={hints:0};assert.equal(useAnswer(owner,attempt),true);assert.equal(attempt.answerUnlocked,true);assert.equal(owner.economy.answers,0);refillEnergy(owner);assert.equal(owner.economy.energy,50);assert.equal(owner.economy.adSkips,0);buyWithDiamonds(owner,{product:'hints10',key:'qa-admin-free-purchase'});assert.equal(owner.economy.diamonds,0);
   assert.equal((await req('progress/freeplay',{enabled:true})).status,200);requireFreeplayTime(owner);const e=(await req('economy')).data.economy;for(const k of ['hints','answers','diamonds','adSkips','freeplayRemainingMs'])assert.equal(e[k],Number.MAX_SAFE_INTEGER);
-  assert.throws(()=>buyWithDiamonds(owner,{product:'adSkips10',key:'qa-admin-cash-only-00'}),e=>e.code==='CASH_ONLY');
+  assert.throws(()=>buyWithDiamonds(owner,{product:'adSkips10',key:'qa-admin-retired-item'}),e=>e.code==='PRODUCT_UNAVAILABLE');
   const exported=(await req('save/export')).data;assert.ok(!JSON.stringify(exported).includes('adminBenefits'));const player={economy:{hints:0,answers:0,adSkips:0}};assert.throws(()=>useHint(player));assert.throws(()=>useAnswer(player,{}));
  }finally{await new Promise(r=>server.close(r));}
 });

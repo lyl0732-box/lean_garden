@@ -1,8 +1,9 @@
-import {mkdir,readFile,writeFile,copyFile,cp} from 'node:fs/promises';import path from 'node:path';import {spawn} from 'node:child_process';import {createHash} from 'node:crypto';import sharp from 'sharp';
+import {mkdir,readFile,writeFile,copyFile} from 'node:fs/promises';import path from 'node:path';import {spawn} from 'node:child_process';import {createHash} from 'node:crypto';import sharp from 'sharp';
 import {buildClientAssets} from './build-client-assets.mjs';
 import {createWriteStream} from 'node:fs';import {createInterface} from 'node:readline';
-const {bundle}=await buildClientAssets(),root=path.resolve('clients/android'),out=path.resolve('dist/android'),assets=path.join(root,'app/src/main/assets');
-await mkdir(out,{recursive:true});await mkdir(assets,{recursive:true});await cp(bundle,assets,{recursive:true});
+const root=path.resolve('clients/android'),out=path.resolve('dist/android'),assets=path.join(root,'app/src/main/assets');
+await buildClientAssets({bundleDir:assets});
+await mkdir(out,{recursive:true});
 await copyFile('public/assets/optimized/garden-world-low.webp',path.join(assets,'login-background.webp'));
 await sharp('public/assets/favicon.svg').resize(192,192).png().toFile(path.join(root,'app/src/main/res/drawable/icon.png'));
 if(!process.argv.includes('--prepare-only')){
@@ -19,6 +20,6 @@ if(!process.argv.includes('--prepare-only')){
   await run(path.join(tools.jdk,'bin/java.exe'),['-jar',path.join(tools.buildTools,'lib/apksigner.jar'),'verify','--verbose','--print-certs',apk]);
   const bytes=await readFile(apk);await writeFile(path.join(out,'build-report.json'),JSON.stringify({date:new Date().toISOString(),file:path.basename(apk),bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),minAndroid:8,targetAPI:36,signature:'existing local test identity; not a store release identity',runtimeDeviceTested:false},null,2));console.log('APK ready:',apk,bytes.length,'bytes');
   await mkdir('public/downloads',{recursive:true});await copyFile(apk,path.join('public/downloads',path.basename(apk)));
-  const release={schema:1,package:'cn.leangarden.client',versionName:version,versionCode:Number(/versionCode\s+(\d+)/.exec(gradle)[1]),url:'/downloads/'+path.basename(apk),bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),notes:'修复花园和小游戏资源栏重叠，八阶法杖随芽芽成长。'};
+  const release={schema:1,package:'cn.leangarden.client',versionName:version,versionCode:Number(/versionCode\s+(\d+)/.exec(gradle)[1]),url:'/downloads/'+path.basename(apk),bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),notes:'无广告、无内购版。已有免广告券可作为活力券继续使用。'};
   await writeFile('public/android-release.json',JSON.stringify(release,null,2));
 }

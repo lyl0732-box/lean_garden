@@ -9,8 +9,8 @@ android {
         applicationId 'cn.leangarden.client'
         minSdk 26
         targetSdk 36
-        versionCode 20
-        versionName '0.13.1'
+        versionCode 22
+        versionName '0.13.4'
     }
     signingConfigs {
         local {
@@ -52,7 +52,6 @@ dependencies {
     implementation 'com.umeng.umsdk:common:+'
     implementation 'com.umeng.umsdk:asms:+'
     implementation 'com.umeng.umsdk:apm:+'
-    implementation 'com.umeng.umsdk:union:3.7.1'
 }
 
 dependencyLocking {

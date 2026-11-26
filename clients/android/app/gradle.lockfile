@@ -4,5 +4,4 @@
 com.umeng.umsdk:apm:2.1.0=debugCompileClasspath,debugRuntimeClasspath,releaseCompileClasspath,releaseRuntimeClasspath
 com.umeng.umsdk:asms:1.8.7.2=debugCompileClasspath,debugRuntimeClasspath,releaseCompileClasspath,releaseRuntimeClasspath
 com.umeng.umsdk:common:10.0.1=debugCompileClasspath,debugRuntimeClasspath,releaseCompileClasspath,releaseRuntimeClasspath
-com.umeng.umsdk:union:3.7.1=debugCompileClasspath,debugRuntimeClasspath,releaseCompileClasspath,releaseRuntimeClasspath
 empty=androidApis,debugAnnotationProcessorClasspath,debugReverseMetadataValues,lintChecks,releaseAnnotationProcessorClasspath,releaseReverseMetadataValues

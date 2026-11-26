@@ -1,14 +1,14 @@
 import test from 'node:test';import assert from 'node:assert/strict';import path from 'node:path';
 import {readFile,writeFile} from 'node:fs/promises';
 process.env.GARDEN_DATA_DIR=path.resolve('artifacts','economy-api-'+Date.now());
-const {createServer}=await import('../server/index.mjs');const {configureCommerce}=await import('../server/commerce.mjs');
+const {createServer}=await import('../server/index.mjs');
 test('real Lean: single-charge resume, finite hints, answer entitlement, XP idempotency, energy exhaustion, safe store and persistence',{timeout:120000},async()=>{
   let server,base,cookie='';const start=async()=>{server=await createServer({allowGuestForTests:true});await new Promise(r=>server.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+server.address().port;};await start();
   async function req(route,body){const r=await fetch(base+'/api/'+route,{method:body?'POST':'GET',headers:{Cookie:cookie,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});if(r.headers.get('set-cookie'))cookie=r.headers.get('set-cookie').split(';')[0];return {status:r.status,data:await r.json()};}
   try{
     let boot=(await req('bootstrap')).data;assert.equal(boot.shop.mode,'diamonds');assert.equal(boot.progress.economy.energy,50);assert.equal(boot.progress.economy.hints,5);assert.equal(boot.progress.economy.answers,0);
     assert.equal((await req('shop/purchase',{product:'hints10',key:'buy-request-000001'})).status,409);
-    assert.equal((await req('energy/ad/complete',{receipt:'forged'})).status,501);
+    assert.equal((await req('energy/ad/complete',{receipt:'forged'})).status,404);
     const starts=await Promise.all([req('level/start',{level:'n01'}),req('level/start',{level:'n01'})]);assert.ok(starts.every(r=>r.status===200));assert.equal(starts[1].data.progress.economy.energy,45);assert.equal(starts[0].data.attempt.run,starts[1].data.attempt.run);
     let b=starts[1].data;const hint=await Promise.all([req('level/hint',{level:'n01',revision:b.attempt.revision}),req('level/hint',{level:'n01',revision:b.attempt.revision})]);assert.deepEqual(hint.map(r=>r.status).sort(),[200,409]);b.attempt=hint.find(r=>r.status===200).data.attempt;
     for(let i=0;i<4;i++){const r=await req('level/hint',{level:'n01',revision:b.attempt.revision});assert.equal(r.status,200);b.attempt=r.data.attempt;}
@@ -24,7 +24,7 @@ test('real Lean: single-charge resume, finite hints, answer entitlement, XP idem
     for(let i=0;i<9;i++){b=(await req('level/reset',{level:'n01',revision:b.attempt.revision})).data;assert.equal(b.progress.economy.energy,40-i*5);assert.equal(b.attempt.answerUnlocked,undefined);assert.equal(b.attempt.hints,0);b=(await req('level/step',{level:'n01',revision:b.attempt.revision,action:'rfl'})).data;assert.equal(b.experience.xp,100);assert.equal(b.progress.completed.n01.stars,3);}
     assert.equal((await req('level/reset',{level:'n01',revision:b.attempt.revision})).data.code,'ENERGY_EMPTY');
     assert.equal((await req('level/start',{level:'n02'})).data.code,'ENERGY_EMPTY');
-    assert.equal((await req('energy/refill',{})).data.code,'ADS_UNAVAILABLE');
+    assert.equal((await req('energy/refill',{})).data.code,'VOUCHERS_EMPTY');
     const gifts=await Promise.all([req('shop/claim-beta',{}),req('shop/claim-beta',{})]);assert.deepEqual(gifts.map(r=>r.status).sort(),[200,409]);assert.equal((await req('economy')).data.economy.adSkips,3);
     assert.equal((await req('energy/refill',{})).data.economy.adSkips,2);b=(await req('level/start',{level:'n02'})).data;assert.equal(b.progress.economy.energy,45);
     await new Promise(r=>server.close(r));await start();b=(await req('level/start',{level:'n02'})).data;assert.equal(b.progress.economy.energy,45);assert.equal(b.progress.economy.growth.xp,1000);
@@ -33,7 +33,7 @@ test('real Lean: single-charge resume, finite hints, answer entitlement, XP idem
     const axiom=axioms.find(e=>e.cardId==='succ_ne');b=(await req('level/step',{level:'n08',practice:true,revision:b.attempt.revision,apply:{entry:axiom.id,target:'goal'}})).data;assert.equal(b.complete,true);
     const before=(await req('economy')).data.economy;const reset=(await req('progress/reset',{confirm:'RESET'})).data;assert.equal(reset.progress.economy.betaClaimed,true);assert.equal(reset.progress.economy.adSkips,2);assert.equal(reset.progress.economy.growth.xp,before.growth.xp);assert.equal((await req('shop/claim-beta',{})).status,409);
     const exported=(await req('save/export')).data;assert.equal(exported.version,9);assert.equal(exported.economy.orders.length,1);
-  }finally{configureCommerce();await new Promise(r=>server.close(r));}
+  }finally{await new Promise(r=>server.close(r));}
 });
 test('a completed pre-economy proof is readable for free, but its first replay charges energy and grants fresh XP',{timeout:30000},async()=>{
   const file=path.join(process.env.GARDEN_DATA_DIR,'progress.json'),data=JSON.parse(await readFile(file,'utf8')),id='a'.repeat(48);
